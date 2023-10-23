@@ -191,6 +191,9 @@ class APIWrapper:
         Returns:
             Dataframe for analysis.    
         """
+        self._searched_dims = search_dimensions.split(',')
+        self._searched_area = search_area_type
+        
         search_string: str = self.build_search_string(search_pop_type, search_dimensions, search_area_type) 
         self.get(search_string)
         return self.create_observation_df()
@@ -206,6 +209,10 @@ class APIWrapper:
         Returns:
             Dataframe for analysis.    
         """
+        # to make the program flow continue for mass testing
+        if (self._current_data is None) or (self._current_data['observations'] is None):
+            return None
+        
         # we only want the observations data
         data: Dict[str, Any] = self._current_data['observations']
 
@@ -220,6 +227,7 @@ class APIWrapper:
                 # option = the word description of the value
                 # option_id = the ONS encoding for that item
                 inner_dict[sub_item['dimension_id']] = sub_item['option']
+                inner_dict[f'{sub_item["dimension_id"]}_id'] = sub_item['option_id']
 
             # the count of observations for this dimension_id and option_id
             inner_dict['count'] = item_dict['observation'] 
@@ -227,6 +235,48 @@ class APIWrapper:
             # add row of data to list
             data_list.append(inner_dict)
 
-        output_df = pd.DataFrame(data_list)
-        return output_df
+        self._query_df = pd.DataFrame(data_list)
+        return self._query_df
+
     
+    def get_summary_by_dimensions(self) -> Dict[str, pd.DataFrame]:
+        """
+            builds and returns summaries of the data grouped by dimension
+         
+        Returns:
+            a dict of both absolute counts for each dimension and proportions
+            normalised by the total.    
+        """        
+        if self._query_df is None:
+            print('No query data available to summarise.')
+            return None
+        
+        self._groupby_dim_dict = {}
+        for dim in self._searched_dims:
+            groupby_ = self._query_df.groupby(dim)[['count']].sum()
+            denom = groupby_.sum()
+            self._groupby_dim_dict[dim] = groupby_
+            self._groupby_dim_dict[f'{dim}_normalised'] = groupby_ / denom
+            
+        return self._groupby_dim_dict
+    
+    
+    def get_summary_by_area(self) -> Dict[str, pd.DataFrame]:
+        """
+            builds and returns summaries of the data grouped by area
+         
+        Returns:
+            a dict of both absolute counts for each area and proportions
+            normalised by the total.    
+        """        
+        if self._query_df is None:
+            print('No query data available to summarise.')
+            return None
+        
+        self._groupby_area_dict = {}
+        groupby_ = self._query_df.groupby(self._searched_area)[['count']].sum()
+        denom = groupby_.sum()
+        self._groupby_area_dict[self._searched_area] = groupby_
+        self._groupby_area_dict[f'{self._searched_area}_normalised'] = groupby_ / denom
+            
+        return self._groupby_area_dict
