@@ -1,0 +1,7 @@
+# Requirements without version specifiers
+requests
+typing
+tqdm
+
+# Requirements with version specifiers
+pandas == 2.0.3
