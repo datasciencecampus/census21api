@@ -320,4 +320,4 @@ class APIWrapper:
         
         for combination in no_single_searches:
             stripped_string = ','.join(combination)
-            data = self.query_api(residence_code, f'{stripped_string}', region)
+            data = self.query_api(residence_code, f"{stripped_string.replace(',','_')}", region)
