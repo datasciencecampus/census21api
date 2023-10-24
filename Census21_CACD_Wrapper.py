@@ -3,6 +3,8 @@ import json
 import pandas as pd
 from typing import List, Dict, Any
 from requests.models import Response
+import itertools
+
 
 class APIWrapper:
     def __init__(self, logger: bool = False) -> None:
@@ -280,3 +282,25 @@ class APIWrapper:
         self._groupby_area_dict[f'{self._searched_area}_normalised'] = groupby_ / denom
             
         return self._groupby_area_dict
+    
+    def loop_through_variables(self, residence_code, region):
+        '''
+        Collects data for all variable combinations relating to residence/region
+            
+        Args:
+            residence_code: str = code relating to residence, eg. 'HH', 'UR'
+            region: str = regional code relating to region, eg. 'rgns'
+            
+        Returns:
+            .csv file for all possible combinations    
+        '''   
+        dims = list(self.get_dims_by_pop_type(residence_code).values())
+        combos = [sorted(i) for i in itertools.product(dims, dims)]
+        trimmed_combos = sorted(list(map(list, set(map(frozenset, combos)))))
+        no_single_searches = [i for i in trimmed_combos if len(i) == 2]
+        
+        for combination in no_single_searches:
+            stripped_string = ','.join(combination)
+            data = self.query_api(residence_code, f'{stripped_string}', region)
+            if data is not None:
+                    data.to_csv(f'data/output/{residence_code}_{stripped_string}_{region}.csv')
