@@ -180,25 +180,30 @@ class APIWrapper:
 
         return search_string  
     
-    
-    def query_api(self, search_pop_type: str = None, search_dimensions: str = None, search_area_type: str = None) -> pd.DataFrame:
+
+    def query_api(self, search_pop_type: str = None, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = False) -> pd.DataFrame:
+
         """
             wrapper function to query api
 
         Args:
             search_pop_type: str = the population code
             search_dimensions: str = the dimensions
-            search_area_type: str = the area type            
-
+            search_area_type: str = the area type
+ 
         Returns:
             Dataframe for analysis.    
         """
         self._searched_dims = search_dimensions.split(',')
         self._searched_area = search_area_type
-        
         search_string: str = self.build_search_string(search_pop_type, search_dimensions, search_area_type) 
         self.get(search_string)
-        return self.create_observation_df()
+        data = self.create_observation_df()
+        
+        if data is not None:
+            data.to_csv(f"data/output/{search_pop_type}_{search_dimensions.replace(',','_')}_{search_area_type}.csv")
+
+        return data
     
     
     def create_observation_df(self) -> pd.DataFrame:
@@ -302,5 +307,3 @@ class APIWrapper:
         for combination in no_single_searches:
             stripped_string = ','.join(combination)
             data = self.query_api(residence_code, f'{stripped_string}', region)
-            if data is not None:
-                    data.to_csv(f'data/output/{residence_code}_{stripped_string}_{region}.csv')

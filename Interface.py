@@ -104,7 +104,6 @@ class Interface():
         self.get_region()
         
         data = self.api.query_api(self.residence_code, f'{dim_1},{dim_2}', self.region)
-        data.to_csv(f'data/output/{self.residence_code}_{dim_1}_{dim_2}_{self.region}.csv')
 
 
     def create_dimension_selection(self):
@@ -125,7 +124,7 @@ class Interface():
         but.grid(column=5, row=3)
         but = Button(text='Loop', command=self.loop)
         but.grid(column=4, row=5)
-
+        
                  
     def list_dimensions(self):
         '''
