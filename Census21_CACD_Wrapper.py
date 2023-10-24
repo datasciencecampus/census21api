@@ -4,6 +4,7 @@ import pandas as pd
 from typing import List, Dict, Any
 from requests.models import Response
 
+
 class APIWrapper:
     def __init__(self, logger: bool = False) -> None:
         self._logger = logger
@@ -47,14 +48,19 @@ class APIWrapper:
             Doesn't raise an error but prints the url and the response code on failure.
         """
         response: Response = requests.get(url=url, verify=True)
-        data_out = response.json()
-
+        try:
+            data_out = response.json()
+        except json.JSONDecodeError as e:
+            if self._logger:
+                print(f'{e} for url: {url} returning None')
+            self._current_data = None  
         # checks if the response code was valid
         if self._valid_status_code(response):
             self._current_data = data_out
         else:
             if self._logger:
                 print(f'response status code: {response.status_code} for url: {url}')
+                print(f'returning None')
             self._current_data = None    
         
         
@@ -140,10 +146,18 @@ class APIWrapper:
       
     
     def get_areas_by_pop_type(self, pop_type: str) -> Dict[str, str]:
+        """
+        Returns:
+            a dictionary of available area codes for the input arg pop_type
+        """
         return self._area_dict[pop_type]
     
     
     def get_dims_by_pop_type(self, pop_type: str) -> Dict[str, str]:
+        """
+        Returns:
+            a dictionary of available dimensions for the input arg pop_type
+        """
         return self._dims_dict[pop_type]    
     
     
