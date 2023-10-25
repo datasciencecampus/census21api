@@ -1,23 +1,37 @@
 import requests
 import json
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Set, Optional
 from requests.models import Response
 import itertools
 import os
-
 
 
 class APIWrapper:
     def __init__(self, logger: bool = False) -> None:
         self._logger = logger
         self._current_data = None
+        self.set_root_string('https://api.beta.ons.gov.uk/v1/population-types')
         self.set_population_types_available()
         self.set_areas_by_pop_types()
         self.set_dims_by_pop_types()
-
         
-    def _valid_status_code(self, response: Response) -> bool:
+
+    def set_root_string(self, root_str: str) -> None:
+        """
+        set the root string for the API
+        """
+        self._root_string = root_str
+    
+    
+    def get_root_string(self) -> str:
+        """
+        getter function for the root string
+        """
+        return self._root_string
+    
+        
+    def _validate_status_code(self, response: Response) -> bool:
         """
         Checks response codes for https requests
             Informational responses (100 – 199)
@@ -32,12 +46,34 @@ class APIWrapper:
         Returns:
             Boolean.
         """
-        if response.status_code >= 200 and response.status_code <= 299:
-            return True
-        return False
+        valid_response = 200 <= response.status_code <= 299
+        if self._logger and not valid_status_code:
+            print(f'response status code: {response.status_code} for url: {self._current_url}')        
+        return valid_response
 
+    
+    def _process_reponse(self, response: Response) -> Optional[Dict[str, Any]]:
+        """
+        get function with minimal validation.
 
-    def get(self, url: str) -> Dict[str, Any]:
+        Args:
+            response: Response = the response from the API call.
+
+        Returns:
+            dictionary of json format from api.       
+        """
+        if not self._validate_status_code(response):
+            return None
+        try:
+            data_out: Dict[str, Any] = response.json()
+        except json.JSONDecodeError as e:
+            data_out = None
+            if self._logger:
+                print(f'{e} for url: {self._current_url} returning None')
+        return data_out
+    
+
+    def get(self, url: str) -> Optional[Dict[str, Any]]:
         """
         get function with minimal validation.
 
@@ -50,23 +86,20 @@ class APIWrapper:
         Raises:
             Doesn't raise an error but prints the url and the response code on failure.
         """
-        response: Response = requests.get(url=url, verify=True)
-        try:
-            data_out = response.json()
-        except json.JSONDecodeError as e:
-            if self._logger:
-                print(f'{e} for url: {url} returning None')
-            self._current_data = None  
+        self._current_url: str = url
+        response: Response = requests.get(url=self._current_url, verify=True)        
         # checks if the response code was valid
-        if self._valid_status_code(response):
-            self._current_data = data_out
-        else:
-            if self._logger:
-                print(f'response status code: {response.status_code} for url: {url}')
-                print(f'returning None')
-            self._current_data = None    
-        
-        
+        self._current_data = self._process_reponse(response)
+        return self._current_data
+    
+    
+    def extract_pop_type_from_item(self, item: Dict[str, str]) -> str:
+        """
+        helper function for splitting pop type
+        """
+        return item["name"].split("-")[3].upper()
+    
+    
     def set_population_types_available(self) -> List[str]:
         """
         Loops through the possible codes to see if returns data.
@@ -75,32 +108,31 @@ class APIWrapper:
         Returns:
             list of the successful population codes.
         """        
-        root_string: str = 'https://api.beta.ons.gov.uk/v1/population-types'
+        
+        root_string: str = self.get_root_string()
         self.get(root_string)
 
         # list comprehension, splits out the suspected population codes from the longer call_code response
         # converts to upper case to mirror upper case shown in the github demo found here: 
             # https://github.com/GSS-Cogs/knowledge/blob/main/api/ons_local_census_api_walkthrough_python.ipynb
         # converts to set to remove duplicates and back to list for easy manipulation
-        possible_codes: List[str] = list(set([item['name'].split('-')[3].upper() for item in self._current_data['items']]))
+        possible_codes: Set[str] = set([self.extract_pop_type_from_item(item) for item in self._current_data['items']])
         working_pop_codes: List[str] = []
 
         for cd in possible_codes:
-            search_string = f'https://api.beta.ons.gov.uk/v1/population-types/{cd}'
+            search_string = f"{root_string}/{cd}"
             self.get(search_string)
 
             # if the attempt returns none we know get has failed
-            if self._current_data is not None:
-                # sometimes the API returns a json with "errors" as a key
-                # that also counts as failing so we ignore that
-                if 'errors' not in self._current_data.keys():
-                    working_pop_codes.append(cd)
+            # sometimes the API returns a json with "errors" as a key
+            # that also counts as failing so we ignore that
+            if isinstance(self._current_data, dict) and "errors" not in self._current_data.keys():
+                working_pop_codes.append(cd)
 
         self._valid_pop_types = working_pop_codes 
     
     
     def get_population_types_available(self) -> List[str]:
-        
         return self._valid_pop_types
     
     
@@ -118,15 +150,15 @@ class APIWrapper:
         # the API structure of parameter_type coming after population type means we can use the same \
         # function for two calls, if this changes at some point this function will break
         # TODO add some error checking for the pop and parameter type inputs
-        self.get(f"https://api.beta.ons.gov.uk/v1/population-types/{pop_type}/{parameter_type}")
+        self.get(f"{self.get_root_string()}/{pop_type}/{parameter_type}")
 
         # dictionary comprehension to connect the description with the useful id code
-        if self._current_data['items'] is not None:
+        if isinstance(self._current_data['items'], list):
             possible_params = {item['label'] : item['id'] for item in self._current_data['items']}  
             return possible_params  
-        else:
-            if self._logger:
-                print(f"Unable to iterate over NoneType for {pop_type = } and {parameter_type = }")
+        if self._logger:
+            print(f"Unable to iterate over NoneType for {pop_type = } and {parameter_type = }")
+    
     
     def set_areas_by_pop_types(self) -> None:
         """
@@ -164,7 +196,7 @@ class APIWrapper:
         return self._dims_dict[pop_type]    
     
     
-    def build_search_string(self, search_pop_type: str = None, search_dimensions: str = None, search_area_type: str = None) -> str:
+    def build_search_string(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None) -> str:
         """
         builds the url based on the search parameters
 
@@ -177,27 +209,19 @@ class APIWrapper:
             the url for the API call
         """    
         # base string to build search off
-        search_string: str = f"https://api.beta.ons.gov.uk/v1/population-types/{search_pop_type}/census-observations?"
+        search_string: str = f"{self.get_root_string()}/{search_pop_type}/census-observations?"
 
-
-        # if not searching for dimensions we don't want to add this because we don't know what the API would return
-        if search_dimensions is not None:
-            search_string += f'dimensions={search_dimensions}'
-
-            # checking to see if anything else is being searched for because then we'll need this "&"
-            # don't worry that this results in the print out including "&amp;" it still works
-            if search_area_type is not None:
-                search_string += '&'
-
-        # same reasoning as search_dimensions above
-        if search_area_type is not None:
-            search_string += f'area-type={search_area_type}'
+        parameter_strings = (
+            f"{name}={param}"
+            for name, param in zip(("dimensions", "area-type"), (search_dimensions, search_area_type))
+            if param is not None
+        )
+        search_string += "&".join(parameter_strings)
 
         return search_string  
     
 
-    def query_api(self, search_pop_type: str = None, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = False) -> pd.DataFrame:
-
+    def query_api(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = False) -> pd.DataFrame:
         """
             wrapper function to query api
 
@@ -215,12 +239,12 @@ class APIWrapper:
         self.get(search_string)
         data = self.create_observation_df()
         
-        if data is not None:
+        if isinstance(data, pd.DataFrame) and create_csv:
             folder_path = 'data/output/'
             if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+                os.makedirs(folder_path) 
             data.to_csv(f"data/output/{search_pop_type}_{search_dimensions.replace(',','_')}_{search_area_type}.csv")
-
+            
         return data
     
     
@@ -305,6 +329,7 @@ class APIWrapper:
         self._groupby_area_dict[f'{self._searched_area}_normalised'] = groupby_ / denom
             
         return self._groupby_area_dict
+    
     
     def loop_through_variables(self, residence_code, region):
         '''
