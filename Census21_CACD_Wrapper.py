@@ -1,19 +1,37 @@
 import requests
 import json
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Set
 from requests.models import Response
+import itertools
+import os
+
 
 class APIWrapper:
     def __init__(self, logger: bool = False) -> None:
         self._logger = logger
         self._current_data = None
+        self.set_root_string('https://api.beta.ons.gov.uk/v1/population-types')
         self.set_population_types_available()
         self.set_areas_by_pop_types()
         self.set_dims_by_pop_types()
-
         
-    def _valid_status_code(self, response: Response) -> bool:
+
+    def set_root_string(self, root_str: str) -> None:
+        """
+        set the root string for the API
+        """
+        self._root_string = root_str
+    
+    
+    def get_root_string(self) -> str:
+        """
+        getter function for the root string
+        """
+        return self._root_string
+    
+        
+    def _validate_status_code(self, response: Response) -> bool:
         """
         Checks response codes for https requests
             Informational responses (100 – 199)
@@ -28,9 +46,7 @@ class APIWrapper:
         Returns:
             Boolean.
         """
-        if response.status_code >= 200 and response.status_code <= 299:
-            return True
-        return False
+        return 200 <= response.status_code <= 299
 
 
     def get(self, url: str) -> Dict[str, Any]:
@@ -47,17 +63,28 @@ class APIWrapper:
             Doesn't raise an error but prints the url and the response code on failure.
         """
         response: Response = requests.get(url=url, verify=True)
-        data_out = response.json()
-
-        # checks if the response code was valid
-        if self._valid_status_code(response):
-            self._current_data = data_out
-        else:
+        try:
+            data_out = response.json()
+        except json.JSONDecodeError as e:
             if self._logger:
-                print(f'response status code: {response.status_code} for url: {url}')
-            self._current_data = None    
+                print(f'{e} for url: {url} returning None')
         
-        
+        self._current_data = None  
+        # checks if the response code was valid
+        if self._validate_status_code(response):
+            self._current_data = data_out
+        if self._logger:
+            print(f'response status code: {response.status_code} for url: {url}')        
+        return self._current_data
+    
+    
+    def extract_pop_type_from_item(self, item: Dict[str, str]) -> str:
+        """
+        helper function for splitting pop type
+        """
+        return item["name"].split("-")[3].upper()
+    
+    
     def set_population_types_available(self) -> List[str]:
         """
         Loops through the possible codes to see if returns data.
@@ -66,32 +93,31 @@ class APIWrapper:
         Returns:
             list of the successful population codes.
         """        
-        root_string: str = 'https://api.beta.ons.gov.uk/v1/population-types'
+        
+        root_string: str = self.get_root_string()
         self.get(root_string)
 
         # list comprehension, splits out the suspected population codes from the longer call_code response
         # converts to upper case to mirror upper case shown in the github demo found here: 
             # https://github.com/GSS-Cogs/knowledge/blob/main/api/ons_local_census_api_walkthrough_python.ipynb
         # converts to set to remove duplicates and back to list for easy manipulation
-        possible_codes: List[str] = list(set([item['name'].split('-')[3].upper() for item in self._current_data['items']]))
+        possible_codes: Set[str] = set([self.extract_pop_type_from_item(item) for item in self._current_data['items']])
         working_pop_codes: List[str] = []
 
         for cd in possible_codes:
-            search_string = f'https://api.beta.ons.gov.uk/v1/population-types/{cd}'
+            search_string = f"{root_string}/{cd}"
             self.get(search_string)
 
             # if the attempt returns none we know get has failed
-            if self._current_data is not None:
-                # sometimes the API returns a json with "errors" as a key
-                # that also counts as failing so we ignore that
-                if 'errors' not in self._current_data.keys():
-                    working_pop_codes.append(cd)
+            # sometimes the API returns a json with "errors" as a key
+            # that also counts as failing so we ignore that
+            if isinstance(self._current_data, dict) and "errors" not in self._current_data.keys():
+                working_pop_codes.append(cd)
 
         self._valid_pop_types = working_pop_codes 
     
     
     def get_population_types_available(self) -> List[str]:
-        
         return self._valid_pop_types
     
     
@@ -109,15 +135,14 @@ class APIWrapper:
         # the API structure of parameter_type coming after population type means we can use the same \
         # function for two calls, if this changes at some point this function will break
         # TODO add some error checking for the pop and parameter type inputs
-        self.get(f"https://api.beta.ons.gov.uk/v1/population-types/{pop_type}/{parameter_type}")
+        self.get(f"{self.get_root_string()}/{pop_type}/{parameter_type}")
 
         # dictionary comprehension to connect the description with the useful id code
-        if self._current_data['items'] is not None:
+        if isinstance(self._current_data['items'], list):
             possible_params = {item['label'] : item['id'] for item in self._current_data['items']}  
             return possible_params  
-        else:
-            if self._logger:
-                print(f"Unable to iterate over NoneType for {pop_type = } and {parameter_type = }")
+        if self._logger:
+            print(f"Unable to iterate over NoneType for {pop_type = } and {parameter_type = }")
     
     def set_areas_by_pop_types(self) -> None:
         """
@@ -140,14 +165,22 @@ class APIWrapper:
       
     
     def get_areas_by_pop_type(self, pop_type: str) -> Dict[str, str]:
+        """
+        Returns:
+            a dictionary of available area codes for the input arg pop_type
+        """
         return self._area_dict[pop_type]
     
     
     def get_dims_by_pop_type(self, pop_type: str) -> Dict[str, str]:
+        """
+        Returns:
+            a dictionary of available dimensions for the input arg pop_type
+        """
         return self._dims_dict[pop_type]    
     
     
-    def build_search_string(self, search_pop_type: str = None, search_dimensions: str = None, search_area_type: str = None) -> str:
+    def build_search_string(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None) -> str:
         """
         builds the url based on the search parameters
 
@@ -160,43 +193,44 @@ class APIWrapper:
             the url for the API call
         """    
         # base string to build search off
-        search_string: str = f"https://api.beta.ons.gov.uk/v1/population-types/{search_pop_type}/census-observations?"
+        search_string: str = f"{self.get_root_string()}/{search_pop_type}/census-observations?"
 
-
-        # if not searching for dimensions we don't want to add this because we don't know what the API would return
-        if search_dimensions is not None:
-            search_string += f'dimensions={search_dimensions}'
-
-            # checking to see if anything else is being searched for because then we'll need this "&"
-            # don't worry that this results in the print out including "&amp;" it still works
-            if search_area_type is not None:
-                search_string += '&'
-
-        # same reasoning as search_dimensions above
-        if search_area_type is not None:
-            search_string += f'area-type={search_area_type}'
+        parameter_strings = (
+            f"{name}={param}"
+            for name, param in zip(("dimensions", "area-type"), (search_dimensions, search_area_type))
+            if param is not None
+        )
+        search_string += "&".join(parameter_strings)
 
         return search_string  
     
-    
-    def query_api(self, search_pop_type: str = None, search_dimensions: str = None, search_area_type: str = None) -> pd.DataFrame:
+
+    def query_api(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = False) -> pd.DataFrame:
+
         """
             wrapper function to query api
 
         Args:
             search_pop_type: str = the population code
             search_dimensions: str = the dimensions
-            search_area_type: str = the area type            
-
+            search_area_type: str = the area type
+ 
         Returns:
             Dataframe for analysis.    
         """
         self._searched_dims = search_dimensions.split(',')
         self._searched_area = search_area_type
-        
         search_string: str = self.build_search_string(search_pop_type, search_dimensions, search_area_type) 
         self.get(search_string)
-        return self.create_observation_df()
+        data = self.create_observation_df()
+        
+        if isinstance(data, pd.DataFrame) and create_csv:
+            folder_path = 'data/output/'
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path) 
+            data.to_csv(f"data/output/{search_pop_type}_{search_dimensions.replace(',','_')}_{search_area_type}.csv")
+            
+        return data
     
     
     def create_observation_df(self) -> pd.DataFrame:
@@ -280,3 +314,24 @@ class APIWrapper:
         self._groupby_area_dict[f'{self._searched_area}_normalised'] = groupby_ / denom
             
         return self._groupby_area_dict
+    
+    
+    def loop_through_variables(self, residence_code, region):
+        '''
+        Collects data for all variable combinations relating to residence/region
+            
+        Args:
+            residence_code: str = code relating to residence, eg. 'HH', 'UR'
+            region: str = regional code relating to region, eg. 'rgns'
+            
+        Returns:
+            .csv file for all possible combinations    
+        '''   
+        dims = list(self.get_dims_by_pop_type(residence_code).values())
+        combos = [sorted(i) for i in itertools.product(dims, dims)]
+        trimmed_combos = sorted(list(map(list, set(map(frozenset, combos)))))
+        no_single_searches = [i for i in trimmed_combos if len(i) == 2]
+        
+        for combination in no_single_searches:
+            stripped_string = ','.join(combination)
+            data = self.query_api(residence_code, stripped_string, region)
