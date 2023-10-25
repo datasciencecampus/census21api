@@ -4,6 +4,7 @@ import pandas as pd
 from typing import List, Dict, Any
 from requests.models import Response
 import itertools
+import os
 
 
 
@@ -215,6 +216,9 @@ class APIWrapper:
         data = self.create_observation_df()
         
         if data is not None:
+            folder_path = 'data/output/'
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
             data.to_csv(f"data/output/{search_pop_type}_{search_dimensions.replace(',','_')}_{search_area_type}.csv")
 
         return data
