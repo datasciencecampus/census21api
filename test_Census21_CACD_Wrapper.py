@@ -42,8 +42,13 @@ response_value_test_cases = [
 def test_valid_status_code(response_value, expected_outcome):
     assert api._valid_status_code(response_value) == expected_outcome
     
-# Trying to ensure that no errors are sneaking in the pop codes list. 
+# Trying to ensure that no errors are sneaking into the pop codes list undetected. 
+
 def test_no_errors_in_pop_codes():
     api.set_population_types_available()
     assert 'errors' not in api._valid_pop_types
 
+def test_get_responds_to_error_correctly():
+    api.get('https://api.beta.ons.gov.uk/')
+    assert api._current_data != None
+    
