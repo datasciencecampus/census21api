@@ -28,14 +28,6 @@ The Python wrapper for the 2021 England and Wales Census Create a Custom Dataset
 
 python3.8 or higher, with pip, numpy and pandas.
 
-### Installation
-
-To use this Python wrapper, you can install it using pip:
-
-```bash
-pip install census-api-wrapper
-```
-
 ### Usage
 
 Here's a basic example of how to use the Python wrapper to query the Census API:
