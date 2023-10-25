@@ -221,7 +221,7 @@ class APIWrapper:
         return search_string  
     
 
-    def query_api(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = False) -> pd.DataFrame:
+    def query_api(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = True) -> pd.DataFrame:
         """
             wrapper function to query api
 
