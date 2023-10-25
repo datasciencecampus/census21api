@@ -1,3 +1,15 @@
+[project]
+name = "census21_cacd_wrapper"
+version = "0.0.1"
+dependencies = [
+    "requests",
+    "typing",
+    "tqdm",
+    "pre-commit",
+    "pandas==2.0.3"
+]
+
+
 [tool.black]
 line-length = 79
 include = '\.pyi?$'
