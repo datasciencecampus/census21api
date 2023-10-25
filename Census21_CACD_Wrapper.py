@@ -159,6 +159,7 @@ class APIWrapper:
         if self._logger:
             print(f"Unable to iterate over NoneType for {pop_type = } and {parameter_type = }")
     
+    
     def set_areas_by_pop_types(self) -> None:
         """
         Loops over the valid pop types and creates a dict of valid area types for each of them
@@ -221,7 +222,6 @@ class APIWrapper:
     
 
     def query_api(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = False) -> pd.DataFrame:
-
         """
             wrapper function to query api
 
