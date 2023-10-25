@@ -1,7 +1,7 @@
 import requests
 import json
 import pandas as pd
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Any, Set, Optional
 from requests.models import Response
 import itertools
 import os
@@ -46,10 +46,34 @@ class APIWrapper:
         Returns:
             Boolean.
         """
-        return 200 <= response.status_code <= 299
+        valid_response = 200 <= response.status_code <= 299
+        if self._logger and not valid_status_code:
+            print(f'response status code: {response.status_code} for url: {self._current_url}')        
+        return valid_response
 
+    
+    def _process_reponse(self, response: Response) -> Optional[Dict[str, Any]]:
+        """
+        get function with minimal validation.
 
-    def get(self, url: str) -> Dict[str, Any]:
+        Args:
+            response: Response = the response from the API call.
+
+        Returns:
+            dictionary of json format from api.       
+        """
+        if not self._validate_status_code(response):
+            return None
+        try:
+            data_out: Dict[str, Any] = response.json()
+        except json.JSONDecodeError as e:
+            data_out = None
+            if self._logger:
+                print(f'{e} for url: {self._current_url} returning None')
+        return data_out
+    
+
+    def get(self, url: str) -> Optional[Dict[str, Any]]:
         """
         get function with minimal validation.
 
@@ -62,19 +86,10 @@ class APIWrapper:
         Raises:
             Doesn't raise an error but prints the url and the response code on failure.
         """
-        response: Response = requests.get(url=url, verify=True)
-        try:
-            data_out = response.json()
-        except json.JSONDecodeError as e:
-            if self._logger:
-                print(f'{e} for url: {url} returning None')
-        
-        self._current_data = None  
+        self._current_url: str = url
+        response: Response = requests.get(url=self._current_url, verify=True)        
         # checks if the response code was valid
-        if self._validate_status_code(response):
-            self._current_data = data_out
-        if self._logger:
-            print(f'response status code: {response.status_code} for url: {url}')        
+        self._current_data = self._process_reponse(response)
         return self._current_data
     
     
