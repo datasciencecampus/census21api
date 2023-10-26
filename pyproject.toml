@@ -16,6 +16,7 @@ authors = [
 description = "A package for custom dataset building using the 2021 census"
 readme = "README.md"
 requires-python = ">=3.6"
+
 version = "0.0.1"
 dependencies = [
     "black",
@@ -23,6 +24,7 @@ dependencies = [
     "pre-commit",
     "requests",
     #"ruff",
+    "tkinter"
     "tqdm",
     "typing",
 ]
