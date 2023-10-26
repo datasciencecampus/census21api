@@ -1,15 +1,36 @@
 [project]
-name = "census21api"
+name = "census21_cacd_wrapper"
+authors = [
+    {name="Michaela Lawrence"},
+    {name="Mac Agbenla"},
+    {name="Lucy Astley-Jones"},
+    {name="Rhodri Cavell"},
+    {name="Ed Cuss"},
+    {name="Fatima Hussain"},
+    {name="Samantha Iacob"},
+    {name="Richard Marshall"},
+    {name="Joel Paull"},
+    {name="Yunus Rabbani"},
+    {name="Mollie Willson"},
+]
+description = "A package for custom dataset building using the 2021 census"
+readme = "README.md"
+requires-python = ">=3.6"
+
 version = "0.0.1"
 dependencies = [
-    "requests",
-    "typing",
-    "tqdm",
-    "pre-commit",
+    "black",
     "pandas==2.0.3",
+    "pre-commit",
+    "requests",
+    #"ruff",
     "tkinter"
+    "tqdm",
+    "typing",
 ]
 
+[project.urls]
+homepage = "https://github.com/MichaelaLawrenceONS/Census21_CACD_Wrapper"
 
 [tool.black]
 line-length = 79
