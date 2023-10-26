@@ -65,7 +65,7 @@ Please make sure to follow the project's coding standards and maintain a clean c
 
 #### MIT License
 
-Copyright (c) 2018 Data Science Campus, Office for National Statistics
+Copyright (c) Office for National Statistics
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
