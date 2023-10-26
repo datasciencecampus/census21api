@@ -1,5 +1,4 @@
 from tkinter import *
-from functools import partial
 from src.Census21_CACD_Wrapper import APIWrapper
 FONT = ("arial",10)
 
@@ -9,8 +8,8 @@ class Interface():
         self.start_selections()
         
         # Define variables
-        self.dimension_drop_1 = None
-        self.dimension_drop_2 = None
+        self.variable_drop_1 = None
+        self.variable_drop_2 = None
         self.regional_drop = None
         self.api = api
 
@@ -43,11 +42,10 @@ class Interface():
 
         variable = StringVar(self.window)
         drop_list = OptionMenu(self.window, variable, *selection)
-        variable.set(text)
+        variable.set(selection[0])
         drop_list.grid(row=row+1, column=column)
-
-        residence_select = Button(text="Select", command=command)
-        residence_select.grid(row=row+2, column=column)
+        
+        self.create_button('Select', command, row+2, column)
 
         return drop_list
 
@@ -70,7 +68,7 @@ class Interface():
 
         variable = StringVar(self.window)
         drop_list = OptionMenu(self.window, variable, *selection)
-        variable.set(text)
+        variable.set(selection[0])
         drop_list.grid(row=row+1, column=column)
 
         return drop_list
@@ -81,15 +79,17 @@ class Interface():
         Retrieve the selection of 'residence dropdown list' and returns abbreviation (abbreviation used in API call)
         '''
         output = self.residence_drop.cget('text')
-        if output == 'Usual Residence':
-            self.residence_code = 'UR'
-        elif output == 'Household':
-            self.residence_code = 'HH'
-        else:
-            self.residence_code = 'HRP'
+        
+        residence_mapping = {
+        'Usual Residence': 'UR',
+        'Household': 'HH',
+        'Household Reference Person' : 'HRP'
+        }
+        
+        self.residence_code = residence_mapping.get(output)
 
-        self.dimension_list = self.list_dimensions()
-        self.create_dimension_selection()
+        self.variable_list = self.list_variables()
+        self.create_variable_selection()
 
 
     def execute_api_call(self):
@@ -99,39 +99,57 @@ class Interface():
         Returns:
              Saves Data to .csv
         '''
-        dim_1 = self.dimension_drop_1.cget('text')
-        dim_2 = self.dimension_drop_2.cget('text')
+        var_1 = self.variable_drop_1.cget('text')
+        var_2 = self.variable_drop_2.cget('text')
         self.get_region()
         
-        data = self.api.query_api(self.residence_code, f'{dim_1},{dim_2}', self.region)
+        if var_1 != 'None' and var_2 != 'None':
+            data = self.api.query_api(self.residence_code, f'{var_1},{var_2}', self.region)
+        elif var_1 == 'None':
+            data = self.api.query_api(self.residence_code, f'{var_2}', self.region)
+        else:
+            data = self.api.query_api(self.residence_code, f'{var_1}', self.region)
 
 
-    def create_dimension_selection(self):
+    def create_variable_selection(self):
         '''
         Creates the remaining three selection dropdown lists & 'Save Data' button after residence selected
         '''
-        # Retrieve list of dimensions 
-        self.dimension_drop_1 = self.drop_config('Variable 1', self.dimension_list, 
+        # Retrieve list of variables 
+        self.variable_drop_1 = self.drop_config('Variable 1', self.variable_list, 
                                  row=2, column=2) 
-        self.dimension_drop_2 = self.drop_config('Variable 2', self.dimension_list, 
+        self.variable_drop_2 = self.drop_config('Variable 2', self.variable_list, 
                                  row=2, column=3)
         self.area_codes = self.list_areas()
         self.regional_drop = self.drop_config('Regional Divisions', 
                                                 self.area_codes, row=2, column=4)
-        but = Button( text = 'Save Data', command=self.execute_api_call)
-        but.grid(column=4, row=4)
-        but = Button(text='Reset', command=self.reset)
-        but.grid(column=5, row=3)
-        but = Button(text='Loop', command=self.loop)
-        but.grid(column=4, row=5)
         
+        self.create_button('Save Data', self.execute_api_call, 4, 4)
+        self.create_button('Reset', self.reset, 3, 5)
+        self.create_button('Loop', self.loop, 5, 4)
+
+        
+    def create_button(self, text, command, row, column):
+        '''
+        Create Button function
+        
+        Args:
+            text: str = The label for button
+            command: function = function to call upon button press
+            row: int = The row to place the button
+            colum: int = The column to place the button
+        '''
+        but = Button(text=text, command=command)
+        but.grid(column=column, row=row)
                  
-    def list_dimensions(self):
+            
+    def list_variables(self):
         '''
-        Returns the list of demensions relating to that residence code (HH, HRP, UR) & add option for None
+        Returns the list of variabless relating to that residence code (HH, HRP, UR) & add option for None
         '''
-        self.dimension_list = list(self.api.get_dims_by_pop_type(self.residence_code).values())
-        return self.dimension_list
+        self.variable_list = list(self.api.get_dims_by_pop_type(self.residence_code).values())
+        self.variable_list.append('None')
+        return self.variable_list
 
 
     def list_areas(self):
@@ -139,6 +157,7 @@ class Interface():
         returns a list of areas relating to the selected residence code
         '''
         area_list = list(self.api.get_areas_by_pop_type(self.residence_code).keys())
+        
         return area_list
 
 
@@ -148,7 +167,7 @@ class Interface():
         '''
         self.residence_drop = self.drop_config_button('Residence Selection', ('Usual Residence', 'Household',
                                 'Household Reference Person'),row=2, column=1, command=self.retrieve_res_input)
-        return self.residence_drop
+    
     
     def reset(self):
         '''
@@ -170,7 +189,10 @@ class Interface():
         self.get_region()
         self.api.loop_through_variables(self.residence_code, self.region)
         
+        
     def get_region(self):
+        '''
+        Retrieves region possibilities for selection residence code
+        '''
         region_dict = self.api.get_areas_by_pop_type(self.residence_code)
-        region_value = self.regional_drop.cget('text')
-        self.region = region_dict[region_value]
+        self.region = region_dict[self.regional_drop.cget('text')]
