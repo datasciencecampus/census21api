@@ -1,5 +1,5 @@
 [project]
-name = "census21_cacd_wrapper"
+name = "census21api"
 version = "0.0.1"
 dependencies = [
     "requests",

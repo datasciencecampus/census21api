@@ -1,5 +1,5 @@
 from tkinter import *
-from src.Census21_CACD_Wrapper import APIWrapper
+from src.census21api.wrapper import APIWrapper
 FONT = ("arial",10)
 
 class Interface():
