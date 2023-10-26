@@ -6,7 +6,8 @@ dependencies = [
     "typing",
     "tqdm",
     "pre-commit",
-    "pandas==2.0.3"
+    "pandas==2.0.3",
+    "tkinter"
 ]
 
 
