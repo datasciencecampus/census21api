@@ -1,6 +1,6 @@
 from tkinter import *
 from functools import partial
-from Census21_CACD_Wrapper import APIWrapper
+from src.Census21_CACD_Wrapper import APIWrapper
 FONT = ("arial",10)
 
 class Interface():
