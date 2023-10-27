@@ -16,6 +16,11 @@ class CensusAPI:
     """
     A wrapper for the 2021 England and Wales Census API.
 
+    Parameters
+    ----------
+    logger : bool, default False
+        Whether to be verbose about issues when connecting to the API.
+
     Attributes
     ----------
     _current_data : dict or None
