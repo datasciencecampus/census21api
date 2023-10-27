@@ -1,11 +1,12 @@
 """Composite strategies for our unit tests."""
 
+from hypothesis import strategies as st
+
 from census21api.constants import (
     AREA_TYPES_BY_POPULATION_TYPE,
     DIMENSIONS_BY_POPULATION_TYPE,
     POPULATION_TYPES,
 )
-from hypothesis import strategies as st
 
 
 @st.composite
