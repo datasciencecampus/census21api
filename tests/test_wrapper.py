@@ -9,6 +9,8 @@ from hypothesis import strategies as st
 
 from census21api import CensusAPI
 
+MOCK_URL = "mock://test.com/"
+
 
 @given(st.booleans())
 def test_init(logger):
@@ -70,3 +72,26 @@ def test_process_response_invalid_json():
         data = api._process_response(response)
 
     assert data is None
+
+
+@given(st.dictionaries(st.text(), st.text()))
+def test_get(json):
+    """Test that the API only gives data from successful responses."""
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.requests.get") as get, mock.patch(
+        "census21api.wrapper.CensusAPI._process_response"
+    ) as process:
+        response = mock.MagicMock()
+        get.return_value = response
+        process.return_value = json
+
+        data = api.get(MOCK_URL)
+
+    assert api._current_url == MOCK_URL
+    assert api._current_data == data
+    assert data == json
+
+    get.assert_called_once_with(MOCK_URL, verify=True)
+    process.assert_called_once_with(response)
