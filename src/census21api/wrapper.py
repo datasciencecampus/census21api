@@ -120,13 +120,13 @@ class CensusAPI:
         Parameters
         ----------
         population_type : str
-            Population type to query. See `centhesus.POPULATION_TYPES`.
+            Population type to query. See `census21api.POPULATION_TYPES`.
         area_type : str
             Area type to query.
-            See `centhesus.AREA_TYPES_BY_POPULATION_TYPE`.
+            See `census21api.AREA_TYPES_BY_POPULATION_TYPE`.
         dimensions : list of str
             Dimensions to query.
-            See `centhesus.DIMENSIONS_BY_POPULATION_TYPE`.
+            See `census21api.DIMENSIONS_BY_POPULATION_TYPE`.
 
         Returns
         -------
@@ -156,13 +156,13 @@ class CensusAPI:
         Parameters
         ----------
         population_type : str
-            Population type to query. See `centhesus.POPULATION_TYPES`.
+            Population type to query. See `census21api.POPULATION_TYPES`.
         area_type : str
             Area type to query.
-            See `centhesus.AREA_TYPES_BY_POPULATION_TYPE`.
+            See `census21api.AREA_TYPES_BY_POPULATION_TYPE`.
         dimensions : list of str
             Dimensions to query.
-            See `centhesus.DIMENSIONS_BY_POPULATION_TYPE`.
+            See `census21api.DIMENSIONS_BY_POPULATION_TYPE`.
         use_id : bool, default True
             If `True` (the default) use the ID for each dimension and
             area type. Otherwise, use the full label.

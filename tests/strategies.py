@@ -1,6 +1,6 @@
 """Composite strategies for our unit tests."""
 
-from centhesus.constants import (
+from census21api.constants import (
     AREA_TYPES_BY_POPULATION_TYPE,
     DIMENSIONS_BY_POPULATION_TYPE,
     POPULATION_TYPES,
