@@ -9,6 +9,8 @@ import pandas as pd
 import requests
 from requests.models import Response
 
+from census21api.constants import API_ROOT, DIMENSIONS_BY_POPULATION_TYPE
+
 
 class CensusAPI:
     """
@@ -108,9 +110,7 @@ class CensusAPI:
             the url for the API call
         """
         # base string to build search off
-        search_string: str = (
-            f"{self.get_root_string()}/{search_pop_type}/census-observations?"
-        )
+        search_string = f"{API_ROOT}/{search_pop_type}/census-observations?"
 
         parameter_strings = (
             f"{name}={param}"
@@ -257,7 +257,7 @@ class CensusAPI:
         Returns:
             .csv file for all possible combinations
         """
-        dims = list(self.get_dims_by_pop_type(residence_code).values())
+        dims = list(DIMENSIONS_BY_POPULATION_TYPE[residence_code].values())
         combos = [sorted(i) for i in itertools.product(dims, dims)]
         trimmed_combos = sorted(list(map(list, set(map(frozenset, combos)))))
         no_single_searches = [i for i in trimmed_combos if len(i) == 2]
