@@ -15,7 +15,7 @@ authors = [
 ]
 description = "A package for custom dataset building using the 2021 census"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 
 version = "0.0.1"
 dependencies = [
