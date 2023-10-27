@@ -47,7 +47,7 @@ response_value_test_cases = [
     "response_value, expected_outcome", response_value_test_cases
 )
 def test_valid_status_code(response_value, expected_outcome):
-    assert api._valid_status_code(response_value) == expected_outcome
+    assert api._validate_status_code(response_value) == expected_outcome
 
 
 # Trying to ensure that no errors are sneaking into the pop codes list undetected.
