@@ -34,9 +34,9 @@ python3.8 or higher, with pip, numpy and pandas.
 
 Here's a basic example of how to use the Python wrapper to query the Census API:
 
-## Using the interface, as shown by the 'interface_example.ipynb'.
+#### Using the interface, as shown by the 'interface_example.ipynb'.
 
-## Alternatively:
+#### Alternatively:
 ```python
 from census_api_wrapper import APIWrapper
 
