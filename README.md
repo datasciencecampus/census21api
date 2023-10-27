@@ -22,6 +22,8 @@ The Python wrapper for the 2021 England and Wales Census Create a Custom Dataset
 
 - **Flexible and Configurable:** The wrapper is designed to be flexible, allowing you to specify the parameters you need for your analysis.
 
+- **Easy to use interface.
+
 ## Getting Started
 
 ### Software
@@ -32,6 +34,9 @@ python3.8 or higher, with pip, numpy and pandas.
 
 Here's a basic example of how to use the Python wrapper to query the Census API:
 
+## Using the interface, as shown by the 'interface_example.ipynb'.
+
+## Alternatively:
 ```python
 from census_api_wrapper import APIWrapper
 
