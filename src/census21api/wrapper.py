@@ -90,21 +90,26 @@ class CensusAPI:
 
     def get(self, url: str) -> Optional[Dict[str, Any]]:
         """
-        get function with minimal validation.
+        Make a call to, and retrieve some data from, the API.
 
-        Args:
-            url: str = the url for the API call.
+        Parameters
+        ----------
+        url : str
+            URL from which to retrieve data.
 
-        Returns:
-            dictionary of json format from api.
-
-        Raises:
-            Doesn't raise an error but prints the url and the response code on failure.
+        Returns
+        -------
+        data : dict or None
+            JSON data from the response of this API call if it is
+            successful, and `None` otherwise.
         """
-        self._current_url: str = url
-        response: Response = requests.get(url=self._current_url, verify=True)
-        # checks if the response code was valid
-        self._current_data = self._process_reponse(response)
+
+        self._current_url = url
+        response = requests.get(url, verify=True)
+
+        data = self._process_response(response)
+        self._current_data = data
+
         return self._current_data
 
     def build_search_string(
