@@ -24,7 +24,7 @@ dependencies = [
     "pre-commit",
     "requests",
     #"ruff",
-    "tkinter"
+    "tkinter",
     "tqdm",
     "typing",
 ]
