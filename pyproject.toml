@@ -1,5 +1,5 @@
 [project]
-name = "census21_cacd_wrapper"
+name = "census21api"
 authors = [
     {name="Michaela Lawrence"},
     {name="Mac Agbenla"},
@@ -12,21 +12,29 @@ authors = [
     {name="Joel Paull"},
     {name="Yunus Rabbani"},
     {name="Mollie Willson"},
+    {name="Henry Wilde"},
 ]
-description = "A package for custom dataset building using the 2021 census"
+description = "A package for querying the 2021 England and Wales Census API"
 readme = "README.md"
-requires-python = ">=3.6"
-
+requires-python = ">=3.8"
 version = "0.0.1"
 dependencies = [
-    "black",
     "pandas==2.0.3",
-    "pre-commit",
     "requests",
-    #"ruff",
-    "tkinter"
     "tqdm",
     "typing",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+lint = [
+    "black",
+    "ruff",
+]
+dev = [
+    "census21api[test,lint]",
 ]
 
 [project.urls]
@@ -34,17 +42,11 @@ homepage = "https://github.com/MichaelaLawrenceONS/Census21_CACD_Wrapper"
 
 [tool.black]
 line-length = 79
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+
+[tool.ruff]
+exclude = ["src/census21api/interface.py"]
+extend-select = ["I", "W"]
+line-length = 79
+
+[tool.ruff.isort]
+known-first-party = ["census21api"]
