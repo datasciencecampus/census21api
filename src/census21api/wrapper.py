@@ -3,6 +3,7 @@
 import itertools
 import json
 import os
+import warnings
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -36,47 +37,56 @@ class CensusAPI:
         self._current_url: str = None
         self._current_data: dict = None
 
-    def _validate_status_code(self, response: Response) -> bool:
+    def _process_response(
+        self, response: Response
+    ) -> Optional[Dict[str, Any]]:
         """
-        Checks response codes for https requests
-            Informational responses (100 – 199)
-            Successful responses (200 – 299)
-            Redirection messages (300 – 399)
-            Client error responses (400 – 499)
-            Server error responses (500 – 599)
+        Validate and extract data from a response.
 
-        Args:
-            response: requests HTTP response object.
+        Valid responses can be decoded from JSON and have a "successful"
+        status code (200-299).
 
-        Returns:
-            Boolean.
+        Parameters
+        ----------
+        response : requests.Response
+            Response to be processed.
+
+        Returns
+        -------
+        data : dict or None
+            Data dictionary if the response is valid and `None` if not.
         """
-        valid_response = 200 <= response.status_code <= 299
-        if self._logger and not valid_response:
-            print(
-                f"response status code: {response.status_code} for url: {self._current_url}"
-            )
-        return valid_response
 
-    def _process_reponse(self, response: Response) -> Optional[Dict[str, Any]]:
-        """
-        get function with minimal validation.
-
-        Args:
-            response: Response = the response from the API call.
-
-        Returns:
-            dictionary of json format from api.
-        """
-        if not self._validate_status_code(response):
-            return None
-        try:
-            data_out: Dict[str, Any] = response.json()
-        except json.JSONDecodeError as e:
-            data_out = None
+        data = None
+        if not 200 <= response.status_code <= 299:
             if self._logger:
-                print(f"{e} for url: {self._current_url} returning None")
-        return data_out
+                warnings.warn(
+                    "\n".join(
+                        (
+                            f"Unsuccessful GET from {self._current_url}",
+                            f"Status code: {response.status_code}",
+                            response.body,
+                        )
+                    ),
+                    UserWarning,
+                )
+            return data
+
+        try:
+            data = response.json()
+        except json.JSONDecodeError as e:
+            if self._logger:
+                warnings.warn(
+                    "\n".join(
+                        (
+                            f"Error decoding data from {self._current_url}:",
+                            str(e),
+                        )
+                    ),
+                    UserWarning,
+                )
+
+        return data
 
     def get(self, url: str) -> Optional[Dict[str, Any]]:
         """
