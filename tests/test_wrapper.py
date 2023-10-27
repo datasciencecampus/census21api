@@ -6,6 +6,7 @@ Created on Mon Oct 23 09:48:04 2023
 """
 
 import pytest
+
 from census21api import APIWrapper
 
 api = APIWrapper()
