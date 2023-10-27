@@ -23,8 +23,7 @@ dependencies = [
     "pandas==2.0.3",
     "pre-commit",
     "requests",
-    #"ruff",
-    "tkinter",
+    "ruff",
     "tqdm",
     "typing",
 ]
