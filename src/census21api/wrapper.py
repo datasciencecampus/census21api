@@ -2,7 +2,6 @@
 
 import itertools
 import json
-import os
 import warnings
 from typing import Any, Dict, List, Optional
 
@@ -11,6 +10,8 @@ import requests
 from requests.models import Response
 
 from census21api.constants import API_ROOT, DIMENSIONS_BY_POPULATION_TYPE
+
+DataLike = Optional[Dict[str, Any]]
 
 
 class CensusAPI:
@@ -37,9 +38,7 @@ class CensusAPI:
         self._current_url: str = None
         self._current_data: dict = None
 
-    def _process_response(
-        self, response: Response
-    ) -> Optional[Dict[str, Any]]:
+    def _process_response(self, response: Response) -> DataLike:
         """
         Validate and extract data from a response.
 
@@ -88,7 +87,7 @@ class CensusAPI:
 
         return data
 
-    def get(self, url: str) -> Optional[Dict[str, Any]]:
+    def get(self, url: str) -> DataLike:
         """
         Make a call to, and retrieve some data from, the API.
 
@@ -112,116 +111,81 @@ class CensusAPI:
 
         return self._current_data
 
-    def build_search_string(
-        self,
-        search_pop_type: str,
-        search_dimensions: str = None,
-        search_area_type: str = None,
-    ) -> str:
+    def _query_table_json(
+        self, population_type: str, area_type: str, dimensions: List[str]
+    ) -> DataLike:
         """
-        builds the url based on the search parameters
+        Retrieve the JSON for a table query from the API.
 
-        Args:
-            search_pop_type: str = the population code
-            search_dimensions: str = the dimensions
-            search_area_type: str = the area type
+        Parameters
+        ----------
+        population_type : str
+            Population type to query. See `centhesus.POPULATION_TYPES`.
+        area_type : str
+            Area type to query.
+            See `centhesus.AREA_TYPES_BY_POPULATION_TYPE`.
+        dimensions : list of str
+            Dimensions to query.
+            See `centhesus.DIMENSIONS_BY_POPULATION_TYPE`.
 
-        Returns:
-            the url for the API call
+        Returns
+        -------
+        data : dict or None
+            JSON data from the API call if it is successful, and `None`
+            otherwise.
         """
-        # base string to build search off
-        search_string = f"{API_ROOT}/{search_pop_type}/census-observations?"
 
-        parameter_strings = (
-            f"{name}={param}"
-            for name, param in zip(
-                ("dimensions", "area-type"),
-                (search_dimensions, search_area_type),
-            )
-            if param is not None
-        )
-        search_string += "&".join(parameter_strings)
+        base = "/".join((API_ROOT, population_type, "census-observations"))
+        parameters = f"area-type={area_type}&dimensions={','.join(dimensions)}"
+        url = "?".join((base, parameters))
 
-        return search_string
-
-    def query_api(
-        self,
-        search_pop_type: str,
-        search_dimensions: str = None,
-        search_area_type: str = None,
-        create_csv: bool = True,
-    ) -> pd.DataFrame:
-        """
-            wrapper function to query api
-
-        Args:
-            search_pop_type: str = the population code
-            search_dimensions: str = the dimensions
-            search_area_type: str = the area type
-
-        Returns:
-            Dataframe for analysis.
-        """
-        self._searched_dims = search_dimensions.split(",")
-        self._searched_area = search_area_type
-        search_string: str = self.build_search_string(
-            search_pop_type, search_dimensions, search_area_type
-        )
-        self.get(search_string)
-        data = self.create_observation_df()
-
-        if isinstance(data, pd.DataFrame) and create_csv:
-            folder_path = "data/output/"
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
-            data.to_csv(
-                f"data/output/{search_pop_type}_{search_dimensions.replace(',','_')}_{search_area_type}.csv"
-            )
+        data = self.get(url)
 
         return data
 
-    def create_observation_df(self) -> pd.DataFrame:
+    def query_table(
+        self,
+        population_type: str,
+        area_type: str,
+        dimensions: List[str],
+        use_id: bool = True,
+    ) -> Optional[pd.DataFrame]:
         """
-        builds the df for the data from the API
+        Query a custom table from the API.
 
-        Args:
-            returned_data_json: dict = the data returned by the search_string
+        Parameters
+        ----------
+        population_type : str
+            Population type to query. See `centhesus.POPULATION_TYPES`.
+        area_type : str
+            Area type to query.
+            See `centhesus.AREA_TYPES_BY_POPULATION_TYPE`.
+        dimensions : list of str
+            Dimensions to query.
+            See `centhesus.DIMENSIONS_BY_POPULATION_TYPE`.
+        use_id : bool, default True
+            If `True` (the default) use the ID for each dimension and
+            area type. Otherwise, use the full label.
 
-        Returns:
-            Dataframe for analysis.
+        Returns
+        -------
+        data : pandas.DataFrame or None
+            Data frame containing the data from the API call if it is
+            successful, and `None` otherwise.
         """
-        # to make the program flow continue for mass testing
-        if (self._current_data is None) or (
-            self._current_data["observations"] is None
-        ):
-            return None
 
-        # we only want the observations data
-        data: Dict[str, Any] = self._current_data["observations"]
+        data = self._query_table_json(population_type, area_type, dimensions)
 
-        data_list: List[Dict[str, Any]] = []
+        if isinstance(data, dict) and "observations" in data:
+            records = _extract_records_from_observations(
+                data["observations"], use_id
+            )
 
-        for item_dict in data:
-            # this temp dict will make each row of our dataframe
-            inner_dict = {}
+            columns = (area_type, *dimensions, "count")
+            data = pd.DataFrame(records, columns=columns)
+            data["population_type"] = population_type
 
-            for sub_item in item_dict["dimensions"]:
-                # dimension_id holds the name of the dimension, option_id is the response
-                # option = the word description of the value
-                # option_id = the ONS encoding for that item
-                inner_dict[sub_item["dimension_id"]] = sub_item["option"]
-                inner_dict[f'{sub_item["dimension_id"]}_id'] = sub_item[
-                    "option_id"
-                ]
-
-            # the count of observations for this dimension_id and option_id
-            inner_dict["count"] = item_dict["observation"]
-
-            # add row of data to list
-            data_list.append(inner_dict)
-
-        self._query_df = pd.DataFrame(data_list)
-        return self._query_df
+            return data
 
     def get_summary_by_dimensions(self) -> Dict[str, pd.DataFrame]:
         """
@@ -285,3 +249,36 @@ class CensusAPI:
         for combination in no_single_searches:
             stripped_string = ",".join(combination)
             _ = self.query_api(residence_code, stripped_string, region)
+
+
+def _extract_records_from_observations(
+    observations: List[Dict[str, Any]], use_id: bool
+) -> List[tuple]:
+    """
+    Extract record information from a set of JSON observations.
+
+    Parameters
+    ----------
+    observations : dict
+        Dictionary of dimension options and count for the observation.
+    use_id : bool
+        If `True`, use the ID for each dimension option and area type.
+        Otherwise, use the full label.
+
+    Returns
+    -------
+    records : list of tuple
+        List of records to be formed into a data frame.
+    """
+
+    option = f"option{'_id' * use_id}"
+
+    records = []
+    for observation in observations:
+        record = (
+            *(dimension[option] for dimension in observation["dimensions"]),
+            observation["observation"],
+        )
+        records.append(record)
+
+    return records
