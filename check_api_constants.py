@@ -1,7 +1,7 @@
 """Script to check whether our constants for the API are up to date."""
 
 import requests
-from centhesus import (
+from census21api import (
     API_ROOT,
     AREA_TYPES_BY_POPULATION_TYPE,
     DIMENSIONS_BY_POPULATION_TYPE,
