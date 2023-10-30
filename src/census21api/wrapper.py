@@ -1,6 +1,5 @@
 """Module for the API wrapper."""
 
-import itertools
 import json
 import warnings
 from typing import Any, Dict, List, Optional
@@ -9,7 +8,7 @@ import pandas as pd
 import requests
 from requests.models import Response
 
-from census21api.constants import API_ROOT, DIMENSIONS_BY_POPULATION_TYPE
+from census21api.constants import API_ROOT
 
 DataLike = Optional[Dict[str, Any]]
 
@@ -174,18 +173,54 @@ class CensusAPI:
             successful, and `None` otherwise.
         """
 
-        data = self._query_table_json(population_type, area_type, dimensions)
+        table_json = self._query_table_json(
+            population_type, area_type, dimensions
+        )
+        data = None
 
-        if isinstance(data, dict) and "observations" in data:
+        if isinstance(table_json, dict) and "observations" in table_json:
             records = _extract_records_from_observations(
-                data["observations"], use_id
+                table_json["observations"], use_id
             )
-
             columns = (area_type, *dimensions, "count")
             data = pd.DataFrame(records, columns=columns)
             data["population_type"] = population_type
 
             return data
+
+    def query_area_type_metadata(
+        self, population_type: str, *area_types: str
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query the metadata on area type(s) for a population type.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type of the area type(s) to be queried.
+        *area_types : str
+            Area type(s) to query. If none are specified, the querist
+            returns all available types for the population type. See
+            `census21api.AREA_TYPES_BY_POPULATION_TYPE` for options.
+
+        Returns
+        -------
+        metadata : pd.DataFrame or None
+            Data frame of area type metadata if the call succeeds, and
+            `None` if not.
+        """
+
+        url = "/".join((API_ROOT, population_type, "area-types?limit=500"))
+        metadata_json = self.get(url)
+        metadata = None
+
+        if isinstance(metadata_json, dict) and "items" in metadata_json:
+            metadata = pd.json_normalize(metadata_json["items"])
+            metadata["population_type"] = population_type
+            if area_types:
+                metadata = metadata[metadata["id"].isin(area_types)]
+
+        return metadata
 
 
 def _extract_records_from_observations(
