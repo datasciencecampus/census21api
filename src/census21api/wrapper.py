@@ -187,69 +187,6 @@ class CensusAPI:
 
             return data
 
-    def get_summary_by_dimensions(self) -> Dict[str, pd.DataFrame]:
-        """
-            builds and returns summaries of the data grouped by dimension
-
-        Returns:
-            a dict of both absolute counts for each dimension and proportions
-            normalised by the total.
-        """
-        if self._query_df is None:
-            print("No query data available to summarise.")
-            return None
-
-        self._groupby_dim_dict = {}
-        for dim in self._searched_dims:
-            groupby_ = self._query_df.groupby(dim)[["count"]].sum()
-            denom = groupby_.sum()
-            self._groupby_dim_dict[dim] = groupby_
-            self._groupby_dim_dict[f"{dim}_normalised"] = groupby_ / denom
-
-        return self._groupby_dim_dict
-
-    def get_summary_by_area(self) -> Dict[str, pd.DataFrame]:
-        """
-            builds and returns summaries of the data grouped by area
-
-        Returns:
-            a dict of both absolute counts for each area and proportions
-            normalised by the total.
-        """
-        if self._query_df is None:
-            print("No query data available to summarise.")
-            return None
-
-        self._groupby_area_dict = {}
-        groupby_ = self._query_df.groupby(self._searched_area)[["count"]].sum()
-        denom = groupby_.sum()
-        self._groupby_area_dict[self._searched_area] = groupby_
-        self._groupby_area_dict[f"{self._searched_area}_normalised"] = (
-            groupby_ / denom
-        )
-
-        return self._groupby_area_dict
-
-    def loop_through_variables(self, residence_code, region):
-        """
-        Collects data for all variable combinations relating to residence/region
-
-        Args:
-            residence_code: str = code relating to residence, eg. 'HH', 'UR'
-            region: str = regional code relating to region, eg. 'rgns'
-
-        Returns:
-            .csv file for all possible combinations
-        """
-        dims = list(DIMENSIONS_BY_POPULATION_TYPE[residence_code].values())
-        combos = [sorted(i) for i in itertools.product(dims, dims)]
-        trimmed_combos = sorted(list(map(list, set(map(frozenset, combos)))))
-        no_single_searches = [i for i in trimmed_combos if len(i) == 2]
-
-        for combination in no_single_searches:
-            stripped_string = ",".join(combination)
-            _ = self.query_api(residence_code, stripped_string, region)
-
 
 def _extract_records_from_observations(
     observations: List[Dict[str, Any]], use_id: bool
