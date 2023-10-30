@@ -9,7 +9,11 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from census21api import CensusAPI
-from census21api.constants import API_ROOT, AREA_TYPES_BY_POPULATION_TYPE
+from census21api.constants import (
+    API_ROOT,
+    AREA_TYPES_BY_POPULATION_TYPE,
+    POPULATION_TYPES,
+)
 from census21api.wrapper import _extract_records_from_observations
 
 from .strategies import (
@@ -256,3 +260,29 @@ def test_query_area_types_invalid(info_and_query, result):
     get.assert_called_once_with(
         "/".join((API_ROOT, population_type, "area-types?limit=500"))
     )
+
+
+@given(st.sampled_from(POPULATION_TYPES))
+def test_query_population_metadata_valid(population_type):
+    """Test the population querist returns a valid series."""
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = {
+            "population_type": {
+                "name": population_type,
+                "label": None,
+                "description": None,
+                "type": None,
+            }
+        }
+
+        metadata = api.query_population_type_metadata(population_type)
+
+    assert isinstance(metadata, pd.Series)
+    assert metadata.index.to_list() == ["name", "label", "description", "type"]
+    assert metadata["name"] == population_type
+    assert metadata.to_list() == [population_type, None, None, None]
+
+    get.assert_called_once_with(f"{API_ROOT}/{population_type}")

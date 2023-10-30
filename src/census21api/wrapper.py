@@ -222,6 +222,37 @@ class CensusAPI:
 
         return metadata
 
+    def query_population_type_metadata(
+        self, population_type: str
+    ) -> Optional[pd.Series]:
+        """
+        Query the metadata for a population type.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to be queried.
+            See `census21api.POPULATION_TYPES`.
+
+        Returns
+        -------
+        metadata : pd.Series or None
+            Series with the population type metadata if the call
+            succeeds, and `None` if not.
+        """
+
+        url = "/".join((API_ROOT, population_type))
+        metadata_json = self.get(url)
+        metadata = None
+
+        if (
+            isinstance(metadata_json, dict)
+            and "population_type" in metadata_json
+        ):
+            metadata = pd.Series(metadata_json["population_type"])
+
+        return metadata
+
 
 def _extract_records_from_observations(
     observations: List[Dict[str, Any]], use_id: bool
