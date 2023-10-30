@@ -2,7 +2,8 @@
 
 import requests
 
-from census21api import (
+from census21api import CensusAPI
+from census21api.constants import (
     API_ROOT,
     AREA_TYPES_BY_POPULATION_TYPE,
     DIMENSIONS_BY_POPULATION_TYPE,
@@ -35,12 +36,11 @@ def _check_population_types():
 def _check_area_types_by_population_type():
     """Check that we have the area types for each population type."""
 
-    for pop_type in POPULATION_TYPES:
-        url = "/".join((API_ROOT, pop_type, "area-types?limit=100"))
-        response = requests.get(url, verify=True)
-        data = response.json()
+    api = CensusAPI()
 
-        available_area_types = set(item["id"] for item in data["items"])
+    for pop_type in POPULATION_TYPES:
+        metadata = api.query_area_type_metadata(pop_type)
+        available_area_types = set(metadata["id"])
         recorded_area_types = AREA_TYPES_BY_POPULATION_TYPE[pop_type]
 
         assert available_area_types == set(recorded_area_types), "\n".join(
