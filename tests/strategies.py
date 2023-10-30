@@ -64,3 +64,35 @@ def st_records_and_queries(draw, max_nrows=10):
         records.append(record)
 
     return records, population_type, area_type, dimensions
+
+
+@st.composite
+def st_area_types_info_and_queries(draw):
+    """Create the parameters and response for an area type query."""
+
+    population_type = draw(st.sampled_from(POPULATION_TYPES))
+
+    area_types_available = AREA_TYPES_BY_POPULATION_TYPE[population_type]
+    area_types = draw(
+        st.lists(
+            st.sampled_from(area_types_available),
+            min_size=0,
+            max_size=5,
+            unique=True,
+        )
+    )
+
+    area_types_info = {
+        "items": [
+            {
+                "id": area_type,
+                "label": st.text(),
+                "description": st.text(),
+                "total_count": st.integers(),
+                "hierarchy_order": st.integers(),
+            }
+            for area_type in area_types_available
+        ]
+    }
+
+    return area_types_info, population_type, area_types

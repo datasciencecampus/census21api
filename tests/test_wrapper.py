@@ -9,10 +9,11 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from census21api import CensusAPI
-from census21api.constants import API_ROOT
+from census21api.constants import API_ROOT, AREA_TYPES_BY_POPULATION_TYPE
 from census21api.wrapper import _extract_records_from_observations
 
 from .strategies import (
+    st_area_types_info_and_queries,
     st_observations,
     st_records_and_queries,
     st_table_queries,
@@ -198,3 +199,60 @@ def test_query_table_invalid(query, result):
     assert data is None
 
     builder.assert_called_once_with(*query)
+
+
+@given(st_area_types_info_and_queries())
+def test_query_area_type_metadata_valid(info_and_query):
+    """Test the area type metadata querist returns a valid list."""
+
+    area_types_info, population_type, area_types = info_and_query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = area_types_info
+
+        metadata = api.query_area_type_metadata(population_type, *area_types)
+
+    area_types = area_types or AREA_TYPES_BY_POPULATION_TYPE[population_type]
+    assert isinstance(metadata, pd.DataFrame)
+    assert len(metadata) == len(area_types)
+
+    expected_columns = [
+        "id",
+        "label",
+        "description",
+        "total_count",
+        "hierarchy_order",
+        "population_type",
+    ]
+    assert metadata.columns.to_list() == expected_columns
+    assert (metadata["population_type"] == population_type).all()
+    assert set(metadata["id"]) == set(area_types)
+
+    get.assert_called_once_with(
+        "/".join((API_ROOT, population_type, "area-types?limit=500"))
+    )
+
+
+@given(
+    st_area_types_info_and_queries(),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.text()))),
+)
+def test_query_area_types_invalid(info_and_query, result):
+    """Test the area type querist returns nothing if the call fails."""
+
+    _, population_type, area_types = info_and_query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+
+        metadata = api.query_area_type_metadata(population_type, *area_types)
+
+    assert metadata is None
+
+    get.assert_called_once_with(
+        "/".join((API_ROOT, population_type, "area-types?limit=500"))
+    )
