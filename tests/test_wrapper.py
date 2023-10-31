@@ -9,10 +9,15 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from census21api import CensusAPI
-from census21api.constants import API_ROOT
+from census21api.constants import (
+    API_ROOT,
+    POPULATION_TYPES,
+)
 from census21api.wrapper import _extract_records_from_observations
 
 from .strategies import (
+    st_category_queries,
+    st_feature_queries,
     st_observations,
     st_records_and_queries,
     st_table_queries,
@@ -95,7 +100,6 @@ def test_get(json):
         response = mock.MagicMock()
         get.return_value = response
         process.return_value = json
-
         data = api.get(MOCK_URL)
 
     assert api._current_url == MOCK_URL
@@ -120,7 +124,6 @@ def test_query_table_json(query, json):
 
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
         get.return_value = json
-
         data = api._query_table_json(population_type, area_type, dimensions)
 
     assert data == json
@@ -162,7 +165,6 @@ def test_query_table_valid(records_and_query, use_id):
     ) as extract:
         querist.return_value = {"observations": "foo"}
         extract.return_value = records
-
         data = api.query_table(population_type, area_type, dimensions, use_id)
 
     assert isinstance(data, pd.DataFrame)
@@ -192,9 +194,183 @@ def test_query_table_invalid(query, result):
         "census21api.wrapper.CensusAPI._query_table_json"
     ) as builder:
         builder.return_value = result
-
         data = api.query_table(*query)
 
     assert data is None
 
     builder.assert_called_once_with(*query)
+
+
+@given(st.sampled_from(POPULATION_TYPES))
+def test_query_population_type_valid(population_type):
+    """Test the population querist returns a valid series."""
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = {
+            "population_type": {
+                "name": population_type,
+                "label": None,
+                "description": None,
+                "type": None,
+            }
+        }
+        metadata = api.query_population_type(population_type)
+
+    assert isinstance(metadata, pd.Series)
+    assert metadata.index.to_list() == ["name", "label", "description", "type"]
+    assert metadata["name"] == population_type
+    assert metadata.to_list() == [population_type, None, None, None]
+
+    get.assert_called_once_with(f"{API_ROOT}/{population_type}")
+
+
+@given(
+    st.sampled_from(POPULATION_TYPES),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
+)
+def test_query_population_type_invalid(population_type, result):
+    """Test the population querist returns nothing on a failed call."""
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+
+        metadata = api.query_population_type(population_type)
+
+    assert metadata is None
+
+    get.assert_called_once_with(f"{API_ROOT}/{population_type}")
+
+
+@given(st_feature_queries())
+def test_query_feature(query):
+    """Test the feature querist can return something valid."""
+
+    population_type, endpoint, items, result = query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+        metadata = api.query_feature(population_type, endpoint, *items)
+
+    assert isinstance(metadata, pd.DataFrame)
+    assert metadata.columns.to_list() == ["id", "population_type"]
+    assert (metadata["population_type"] == population_type).all()
+    if items:
+        assert len(metadata) == len(items)
+        assert set(metadata["id"]) == set(items)
+
+    get.assert_called_once_with(
+        "/".join((API_ROOT, population_type, f"{endpoint}?limit=500"))
+    )
+
+
+@given(
+    st_feature_queries(),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
+)
+def test_query_feature_invalid(query, result):
+    """Test the feature querist returns nothing if the call fails."""
+
+    population_type, endpoint, items, _ = query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+        metadata = api.query_feature(population_type, endpoint, *items)
+
+    assert metadata is None
+
+    get.assert_called_once_with(
+        "/".join((API_ROOT, population_type, f"{endpoint}?limit=500"))
+    )
+
+
+@given(st_category_queries())
+def test_query_categories_single_call(query):
+    """Test the category querist works on a single call."""
+
+    population_type, feature, item, endpoint, items = query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = {"count": 1, "total_count": 1, "items": items}
+        categories = api.query_categories(population_type, feature, item)
+
+    assert isinstance(categories, pd.DataFrame)
+    assert len(categories) == len(items)
+    assert set(categories["item"]) == set(i["item"] for i in items)
+    assert (categories["population_type"] == population_type).all()
+
+    expected_columns = ["item", "population_type"]
+    assert categories.columns.to_list() == expected_columns
+
+    get.assert_called_once_with(
+        "/".join(
+            (API_ROOT, population_type, feature, item, f"{endpoint}?limit=500")
+        )
+    )
+
+
+@given(st_category_queries())
+def test_query_categories_multiple_calls(query):
+    """Test the category querist works with multiple calls."""
+
+    population_type, feature, item, endpoint, items = query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = {
+            "count": 1,
+            "total_count": 2,
+            "items": items.copy(),
+        }
+        categories = api.query_categories(population_type, feature, item)
+
+    assert isinstance(categories, pd.DataFrame)
+    assert categories.columns.to_list() == ["item", "population_type"]
+    assert len(categories) == len(items) * 2
+    assert set(categories["item"]) == set(i["item"] for i in items)
+    assert (categories["population_type"] == population_type).all()
+
+    assert get.call_count == 2
+    get.assert_called_with(
+        "/".join(
+            (
+                API_ROOT,
+                population_type,
+                feature,
+                item,
+                f"{endpoint}?limit=500&offset=1",
+            )
+        )
+    )
+
+
+@given(
+    st_category_queries(),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
+)
+def test_query_categories_invalid(query, result):
+    """Test the category querist returns nothing on a failed call."""
+
+    population_type, feature, item, endpoint, _ = query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+        categories = api.query_categories(population_type, feature, item)
+
+    assert categories is None
+
+    get.assert_called_once_with(
+        f"{API_ROOT}/{population_type}/{feature}/{item}/{endpoint}?limit=500"
+    )

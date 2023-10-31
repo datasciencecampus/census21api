@@ -27,7 +27,7 @@ def st_table_queries(draw):
 
 
 @st.composite
-def st_observations(draw, max_nrows=10):
+def st_observations(draw, max_nrows=5):
     """Create a set of observations for a test."""
 
     _, area_type, dimensions = draw(st_table_queries())
@@ -64,3 +64,45 @@ def st_records_and_queries(draw, max_nrows=10):
         records.append(record)
 
     return records, population_type, area_type, dimensions
+
+
+@st.composite
+def st_feature_queries(draw):
+    """Create a feature metadata query pack for testing."""
+
+    population_type = draw(st.sampled_from(POPULATION_TYPES))
+    endpoint = draw(st.sampled_from(("area-types", "dimensions")))
+
+    items_by_population_type = (
+        AREA_TYPES_BY_POPULATION_TYPE
+        if endpoint == "area-types"
+        else DIMENSIONS_BY_POPULATION_TYPE
+    )
+    possible_items = items_by_population_type[population_type]
+    items = draw(st.lists(st.sampled_from(possible_items), unique=True))
+
+    result = {"items": [{"id": item} for item in possible_items]}
+
+    return population_type, endpoint, items, result
+
+
+@st.composite
+def st_category_queries(draw):
+    """Create a category metadata query pack for testing."""
+
+    population_type = draw(st.sampled_from(POPULATION_TYPES))
+    feature = draw(st.sampled_from(("area-types", "dimensions")))
+    endpoint = "areas" if feature == "area-types" else "categorisations"
+
+    items_by_population_type = (
+        AREA_TYPES_BY_POPULATION_TYPE
+        if feature == "area-types"
+        else DIMENSIONS_BY_POPULATION_TYPE
+    )
+    possible_items = items_by_population_type[population_type]
+    item = draw(st.sampled_from(possible_items))
+
+    num_items = draw(st.integers(1, 5))
+    items = [{"item": st.text()} for _ in range(num_items)]
+
+    return population_type, feature, item, endpoint, items

@@ -1,15 +1,14 @@
 """Module for the API wrapper."""
 
-import itertools
-import json
 import warnings
-from typing import Any, Dict, List, Optional
+from json import JSONDecodeError
+from typing import Any, Dict, List, Literal, Optional
 
 import pandas as pd
 import requests
 from requests.models import Response
 
-from census21api.constants import API_ROOT, DIMENSIONS_BY_POPULATION_TYPE
+from census21api.constants import API_ROOT
 
 DataLike = Optional[Dict[str, Any]]
 
@@ -73,7 +72,7 @@ class CensusAPI:
 
         try:
             data = response.json()
-        except json.JSONDecodeError as e:
+        except JSONDecodeError as e:
             if self._logger:
                 warnings.warn(
                     "\n".join(
@@ -120,13 +119,14 @@ class CensusAPI:
         Parameters
         ----------
         population_type : str
-            Population type to query. See `census21api.POPULATION_TYPES`.
+            Population type to query.
+            See `census21api.constants.POPULATION_TYPES`.
         area_type : str
             Area type to query.
-            See `census21api.AREA_TYPES_BY_POPULATION_TYPE`.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
         dimensions : list of str
             Dimensions to query.
-            See `census21api.DIMENSIONS_BY_POPULATION_TYPE`.
+            See `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`.
 
         Returns
         -------
@@ -153,16 +153,21 @@ class CensusAPI:
         """
         Query a custom table from the API.
 
+        This method connects to the `census-observations` endpoint
+        `/{population_type}/census-observations` with query parameters
+        `?area-type={area_type}&dimensions={','.join(dimensions)}`.
+
         Parameters
         ----------
         population_type : str
-            Population type to query. See `census21api.POPULATION_TYPES`.
+            Population type to query.
+            See `census21api.constants.POPULATION_TYPES`.
         area_type : str
             Area type to query.
-            See `census21api.AREA_TYPES_BY_POPULATION_TYPE`.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
         dimensions : list of str
             Dimensions to query.
-            See `census21api.DIMENSIONS_BY_POPULATION_TYPE`.
+            See `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`.
         use_id : bool, default True
             If `True` (the default) use the ID for each dimension and
             area type. Otherwise, use the full label.
@@ -174,81 +179,149 @@ class CensusAPI:
             successful, and `None` otherwise.
         """
 
-        data = self._query_table_json(population_type, area_type, dimensions)
+        table_json = self._query_table_json(
+            population_type, area_type, dimensions
+        )
+        data = None
 
-        if isinstance(data, dict) and "observations" in data:
+        if isinstance(table_json, dict) and "observations" in table_json:
             records = _extract_records_from_observations(
-                data["observations"], use_id
+                table_json["observations"], use_id
             )
-
             columns = (area_type, *dimensions, "count")
             data = pd.DataFrame(records, columns=columns)
             data["population_type"] = population_type
 
             return data
 
-    def get_summary_by_dimensions(self) -> Dict[str, pd.DataFrame]:
+    def query_population_type(
+        self, population_type: str
+    ) -> Optional[pd.Series]:
         """
-            builds and returns summaries of the data grouped by dimension
+        Query the metadata for a population type.
 
-        Returns:
-            a dict of both absolute counts for each dimension and proportions
-            normalised by the total.
+        This method connects to the `population-types` endpoint for a
+        population type (ie. `/{population_type}`) and returns a series
+        format of the metadata there.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to be queried.
+            See `census21api.constants.POPULATION_TYPES`.
+
+        Returns
+        -------
+        metadata : pd.Series or None
+            Series with the population type metadata if the call
+            succeeds, and `None` if not.
         """
-        if self._query_df is None:
-            print("No query data available to summarise.")
-            return None
 
-        self._groupby_dim_dict = {}
-        for dim in self._searched_dims:
-            groupby_ = self._query_df.groupby(dim)[["count"]].sum()
-            denom = groupby_.sum()
-            self._groupby_dim_dict[dim] = groupby_
-            self._groupby_dim_dict[f"{dim}_normalised"] = groupby_ / denom
+        url = "/".join((API_ROOT, population_type))
+        json = self.get(url)
+        metadata = None
 
-        return self._groupby_dim_dict
+        if isinstance(json, dict) and "population_type" in json:
+            metadata = pd.Series(json["population_type"])
 
-    def get_summary_by_area(self) -> Dict[str, pd.DataFrame]:
+        return metadata
+
+    def query_feature(
+        self,
+        population_type: str,
+        feature: Literal["area-types", "dimensions"],
+        *items: str,
+    ) -> Optional[pd.DataFrame]:
         """
-            builds and returns summaries of the data grouped by area
+        Query metadata on a feature for a population type.
 
-        Returns:
-            a dict of both absolute counts for each area and proportions
-            normalised by the total.
+        This method connects to the `area-types` and `dimensions`
+        endpoints (ie. `/{population_type}/{endpoint}`) and returns a
+        data frame format of the metadata there.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        feature : {"area-types", "dimensions"}
+            Endpoint of the feature to query.
+        *items : str
+            Items to query from the endpoint. If not specified,
+            return all items at the endpoint. For dimensions, see
+            `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`, and
+            `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE` for
+            area types.
+
+        Returns
+        -------
+        metadata : pd.DataFrame or None
+            Data frame with the metadata if the call succeeds, and
+            `None` if not.
         """
-        if self._query_df is None:
-            print("No query data available to summarise.")
-            return None
 
-        self._groupby_area_dict = {}
-        groupby_ = self._query_df.groupby(self._searched_area)[["count"]].sum()
-        denom = groupby_.sum()
-        self._groupby_area_dict[self._searched_area] = groupby_
-        self._groupby_area_dict[f"{self._searched_area}_normalised"] = (
-            groupby_ / denom
+        url = "/".join((API_ROOT, population_type, f"{feature}?limit=500"))
+        json = self.get(url)
+        metadata = None
+
+        if isinstance(json, dict) and "items" in json:
+            metadata = pd.json_normalize(json["items"])
+            metadata["population_type"] = population_type
+            if items:
+                metadata = metadata[metadata["id"].isin(items)]
+
+        return metadata
+
+    def query_categories(
+        self,
+        population_type: str,
+        feature: Literal["area-types", "dimensions"],
+        item: str,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query metadata on the categories of a particular feature item.
+
+        This method connects to different endpoints depending on
+        `feature`:
+
+        - `/{population_type}/area-types/{item}/areas`
+        - `/{population_type}/dimensions/{item}/categorisations`
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        feature : {"area-types", "dimensions"}
+            Endpoint of the feature to query.
+        item : str
+            ID of the item in the feature to query.
+
+        Returns
+        -------
+        categories : pd.DataFrame or None
+            Metadata on the categories for the feature item if the call
+            succeeds, and `None` if not.
+        """
+
+        endpoint = "areas" if feature == "area-types" else "categorisations"
+        url = "/".join(
+            (API_ROOT, population_type, feature, item, f"{endpoint}?limit=500")
         )
+        json = self.get(url)
+        categories = None
 
-        return self._groupby_area_dict
+        if isinstance(json, dict) and "items" in json:
+            items = json["items"]
 
-    def loop_through_variables(self, residence_code, region):
-        """
-        Collects data for all variable combinations relating to residence/region
+            total_counted = json["count"]
+            while total_counted < json["total_count"]:
+                json = self.get(url + f"&offset={total_counted}")
+                items.extend(json["items"])
+                total_counted += json["count"]
 
-        Args:
-            residence_code: str = code relating to residence, eg. 'HH', 'UR'
-            region: str = regional code relating to region, eg. 'rgns'
+            categories = pd.json_normalize(items)
+            categories["population_type"] = population_type
 
-        Returns:
-            .csv file for all possible combinations
-        """
-        dims = list(DIMENSIONS_BY_POPULATION_TYPE[residence_code].values())
-        combos = [sorted(i) for i in itertools.product(dims, dims)]
-        trimmed_combos = sorted(list(map(list, set(map(frozenset, combos)))))
-        no_single_searches = [i for i in trimmed_combos if len(i) == 2]
-
-        for combination in no_single_searches:
-            stripped_string = ",".join(combination)
-            _ = self.query_api(residence_code, stripped_string, region)
+        return categories
 
 
 def _extract_records_from_observations(
