@@ -17,6 +17,7 @@ from census21api.constants import (
 from census21api.wrapper import _extract_records_from_observations
 
 from .strategies import (
+    st_area_type_areas_and_queries,
     st_area_types_info_and_queries,
     st_observations,
     st_records_and_queries,
@@ -253,6 +254,61 @@ def test_query_area_types_invalid(info_and_query, result):
 
     get.assert_called_once_with(
         "/".join((API_ROOT, population_type, "area-types?limit=500"))
+    )
+
+
+@given(st_area_type_areas_and_queries())
+def test_query_area_type_areas_valid_one_shot(areas_and_query):
+    """Test the areas querist can produce responses on a single call."""
+
+    area_items, population_type, area_type = areas_and_query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get, mock.patch(
+        "census21api.wrapper.CensusAPI._query_any_extra_area_items"
+    ) as extra:
+        get.return_value = {"items": area_items}
+        extra.return_value = area_items
+        areas = api.query_area_type_areas(population_type, area_type)
+
+    assert isinstance(areas, pd.DataFrame)
+    assert len(areas) == len(area_items)
+
+    expected_columns = ["id", "label", "area_type", "population_type"]
+    assert areas.columns.to_list() == expected_columns
+    assert (areas["area_type"] == area_type).all()
+    assert (areas["population_type"] == population_type).all()
+    for column in ("id", "label"):
+        expected = [item[column] for item in area_items]
+        assert areas[column].to_list() == expected
+
+    url = "/".join(
+        (API_ROOT, population_type, "area-types", area_type, "areas?limit=500")
+    )
+    get.assert_called_once_with(url)
+    extra.assert_called_once_with(get.return_value, url)
+
+
+@given(
+    st_area_type_areas_and_queries(),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
+)
+def test_query_area_type_areas_invalid(areas_and_query, result):
+    """Test that the areas querist returns nothing on a failed call."""
+
+    _, population_type, area_type = areas_and_query
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+        areas = api.query_area_type_areas(population_type, area_type)
+
+    assert areas is None
+
+    get.assert_called_once_with(
+        f"{API_ROOT}/{population_type}/area-types/{area_type}/areas?limit=500"
     )
 
 

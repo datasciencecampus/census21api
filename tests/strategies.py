@@ -27,7 +27,7 @@ def st_table_queries(draw):
 
 
 @st.composite
-def st_observations(draw, max_nrows=10):
+def st_observations(draw, max_nrows=5):
     """Create a set of observations for a test."""
 
     _, area_type, dimensions = draw(st_table_queries())
@@ -96,3 +96,25 @@ def st_area_types_info_and_queries(draw):
     }
 
     return area_types_info, population_type, area_types
+
+
+@st.composite
+def st_area_type_areas_and_queries(draw):
+    """Create a set of area type areas and their query parameters."""
+
+    population_type = draw(st.sampled_from(POPULATION_TYPES))
+    area_type = draw(
+        st.sampled_from(AREA_TYPES_BY_POPULATION_TYPE[population_type])
+    )
+
+    num_items = draw(st.integers(min_value=1, max_value=5))
+    area_items = [
+        {
+            "id": draw(st.text()),
+            "label": draw(st.text()),
+            "area_type": area_type,
+        }
+        for _ in range(num_items)
+    ]
+
+    return area_items, population_type, area_type
