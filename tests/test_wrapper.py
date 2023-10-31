@@ -100,7 +100,6 @@ def test_get(json):
         response = mock.MagicMock()
         get.return_value = response
         process.return_value = json
-
         data = api.get(MOCK_URL)
 
     assert api._current_url == MOCK_URL
@@ -125,7 +124,6 @@ def test_query_table_json(query, json):
 
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
         get.return_value = json
-
         data = api._query_table_json(population_type, area_type, dimensions)
 
     assert data == json
@@ -167,7 +165,6 @@ def test_query_table_valid(records_and_query, use_id):
     ) as extract:
         querist.return_value = {"observations": "foo"}
         extract.return_value = records
-
         data = api.query_table(population_type, area_type, dimensions, use_id)
 
     assert isinstance(data, pd.DataFrame)
@@ -197,7 +194,6 @@ def test_query_table_invalid(query, result):
         "census21api.wrapper.CensusAPI._query_table_json"
     ) as builder:
         builder.return_value = result
-
         data = api.query_table(*query)
 
     assert data is None
@@ -215,7 +211,6 @@ def test_query_area_type_metadata_valid(info_and_query):
 
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
         get.return_value = area_types_info
-
         metadata = api.query_area_type_metadata(population_type, *area_types)
 
     area_types = area_types or AREA_TYPES_BY_POPULATION_TYPE[population_type]
@@ -252,7 +247,6 @@ def test_query_area_types_invalid(info_and_query, result):
 
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
         get.return_value = result
-
         metadata = api.query_area_type_metadata(population_type, *area_types)
 
     assert metadata is None
@@ -263,7 +257,7 @@ def test_query_area_types_invalid(info_and_query, result):
 
 
 @given(st.sampled_from(POPULATION_TYPES))
-def test_query_population_metadata_valid(population_type):
+def test_query_population_type_metadata_valid(population_type):
     """Test the population querist returns a valid series."""
 
     api = CensusAPI()
@@ -277,12 +271,30 @@ def test_query_population_metadata_valid(population_type):
                 "type": None,
             }
         }
-
         metadata = api.query_population_type_metadata(population_type)
 
     assert isinstance(metadata, pd.Series)
     assert metadata.index.to_list() == ["name", "label", "description", "type"]
     assert metadata["name"] == population_type
     assert metadata.to_list() == [population_type, None, None, None]
+
+    get.assert_called_once_with(f"{API_ROOT}/{population_type}")
+
+
+@given(
+    st.sampled_from(POPULATION_TYPES),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
+)
+def test_query_population_type_metadata_invalid(population_type, result):
+    """Test the population querist returns nothing on a failed call."""
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = result
+
+        metadata = api.query_population_type_metadata(population_type)
+
+    assert metadata is None
 
     get.assert_called_once_with(f"{API_ROOT}/{population_type}")
