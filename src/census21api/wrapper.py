@@ -119,13 +119,14 @@ class CensusAPI:
         Parameters
         ----------
         population_type : str
-            Population type to query. See `census21api.POPULATION_TYPES`.
+            Population type to query.
+            See `census21api.constants.POPULATION_TYPES`.
         area_type : str
             Area type to query.
-            See `census21api.AREA_TYPES_BY_POPULATION_TYPE`.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
         dimensions : list of str
             Dimensions to query.
-            See `census21api.DIMENSIONS_BY_POPULATION_TYPE`.
+            See `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`.
 
         Returns
         -------
@@ -155,13 +156,14 @@ class CensusAPI:
         Parameters
         ----------
         population_type : str
-            Population type to query. See `census21api.POPULATION_TYPES`.
+            Population type to query.
+            See `census21api.constants.POPULATION_TYPES`.
         area_type : str
             Area type to query.
-            See `census21api.AREA_TYPES_BY_POPULATION_TYPE`.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
         dimensions : list of str
             Dimensions to query.
-            See `census21api.DIMENSIONS_BY_POPULATION_TYPE`.
+            See `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`.
         use_id : bool, default True
             If `True` (the default) use the ID for each dimension and
             area type. Otherwise, use the full label.
@@ -201,7 +203,7 @@ class CensusAPI:
         *area_types : str
             Area type(s) to query. If none are specified, the querist
             returns all available types for the population type. See
-            `census21api.AREA_TYPES_BY_POPULATION_TYPE` for options.
+            `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
 
         Returns
         -------
@@ -222,6 +224,81 @@ class CensusAPI:
 
         return metadata
 
+    def _query_any_extra_area_items(
+        self, areas_json: Dict[str, Any], url: str
+    ) -> List[Dict]:
+        """
+        Query all the area type areas missed from the first call.
+
+        Some area types have hundreds or thousands of areas, and the API
+        has a hard limit on the size of its responses at 500. So, we use
+        this function to call the API with increasing offsets until we
+        have all the areas.
+
+        Parameters
+        ----------
+        areas_json : dict
+            JSON response from the first API area type areas call.
+        url : str
+            Base area type areas URL from which to query.
+
+        Returns
+        -------
+        items : list of dict
+            Area type area items.
+        """
+
+        items = areas_json["items"]
+        total_counted = areas_json["count"]
+        while total_counted < areas_json["total_count"]:
+            areas_json = self.get(url + f"&offset={total_counted}")
+            print(total_counted, items, areas_json["items"], sep="\n")
+            items.extend(areas_json["items"])
+            total_counted += areas_json["count"]
+        print(total_counted, items, "\n", sep="\n")
+
+        return items
+
+    def query_area_type_areas(
+        self, population_type: str, area_type: str
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query the areas in an area type for a population type.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type of the area type to be queried.
+        area_type : str
+            Area type whose areas will be queried.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
+
+        Returns
+        -------
+        areas : pd.DataFrame or None
+            Data frame containing the area information if the call
+            succeeds, and `None` if not.
+        """
+
+        url = "/".join(
+            (
+                API_ROOT,
+                population_type,
+                "area-types",
+                area_type,
+                "areas?limit=500",
+            )
+        )
+        areas_json = self.get(url)
+        areas = None
+
+        if isinstance(areas_json, dict) and "items" in areas_json:
+            items = self._query_any_extra_area_items(areas_json, url)
+            areas = pd.json_normalize(items)
+            areas["population_type"] = population_type
+
+        return areas
+
     def query_population_type_metadata(
         self, population_type: str
     ) -> Optional[pd.Series]:
@@ -232,7 +309,7 @@ class CensusAPI:
         ----------
         population_type : str
             Population type to be queried.
-            See `census21api.POPULATION_TYPES`.
+            See `census21api.constants.POPULATION_TYPES`.
 
         Returns
         -------
