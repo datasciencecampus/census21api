@@ -67,6 +67,26 @@ def st_records_and_queries(draw, max_nrows=10):
 
 
 @st.composite
+def st_feature_queries(draw):
+    """Create a metadata query pack for testing."""
+
+    population_type = draw(st.sampled_from(POPULATION_TYPES))
+    endpoint = draw(st.sampled_from(("area-types", "dimensions")))
+
+    items_by_population_type = (
+        AREA_TYPES_BY_POPULATION_TYPE
+        if endpoint == "area-types"
+        else DIMENSIONS_BY_POPULATION_TYPE
+    )
+    possible_items = items_by_population_type[population_type]
+    items = draw(st.lists(st.sampled_from(possible_items), unique=True))
+
+    result = {"items": [{"id": item} for item in possible_items]}
+
+    return population_type, endpoint, items, result
+
+
+@st.composite
 def st_area_types_info_and_queries(draw):
     """Create the parameters and response for an area type query."""
 
