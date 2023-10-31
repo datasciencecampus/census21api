@@ -21,7 +21,6 @@ version = "0.0.1"
 dependencies = [
     "pandas<2.1",
     "requests",
-    "tqdm",
     "typing",
 ]
 
@@ -29,10 +28,11 @@ dependencies = [
 test = [
     "hypothesis",
     "pytest",
+    "pytest-cov",
     "pytest-randomly",
 ]
 lint = [
-    "black",
+    "black<24",
     "ruff",
 ]
 dev = [
@@ -46,7 +46,6 @@ homepage = "https://github.com/MichaelaLawrenceONS/Census21_CACD_Wrapper"
 line-length = 79
 
 [tool.ruff]
-exclude = ["src/census21api/interface.py"]
 extend-select = ["I", "W"]
 line-length = 79
 

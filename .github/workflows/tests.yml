@@ -32,7 +32,7 @@ jobs:
           python -m pip install ".[test]"
       - name: Run tests
         run: |
-          python -m pytest tests
+          python -m pytest --cov=census21api --cov-fail-under=100 tests
       - name: Install and run linters
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.11
         run: |
