@@ -258,6 +258,42 @@ def test_query_area_types_invalid(info_and_query, result):
 
 
 @given(st_area_type_areas_and_queries())
+def test_query_any_extra_area_items_no_extras(areas_and_query):
+    """Test the areas querist helper does nothing if there's no need."""
+
+    area_items, population_type, area_type = areas_and_query
+
+    api = CensusAPI()
+
+    url = "/".join((population_type, area_type))
+    areas_json = {"items": area_items, "count": 0, "total_count": 0}
+
+    items = api._query_any_extra_area_items(areas_json, url)
+
+    assert items == area_items
+
+
+@given(st_area_type_areas_and_queries())
+def test_query_any_extra_area_items_with_extras(areas_and_query):
+    """Test the areas querist helper makes more calls if needed."""
+
+    area_items, population_type, area_type = areas_and_query
+
+    api = CensusAPI()
+
+    url = "/".join((population_type, area_type))
+    areas_json = {"items": area_items.copy(), "count": 1, "total_count": 2}
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = areas_json
+        items = api._query_any_extra_area_items(areas_json, url)
+
+    assert items == area_items * 2
+
+    get.assert_called_once_with(url + "&offset=1")
+
+
+@given(st_area_type_areas_and_queries())
 def test_query_area_type_areas_valid_one_shot(areas_and_query):
     """Test the areas querist can produce responses on a single call."""
 
