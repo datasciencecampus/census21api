@@ -68,7 +68,7 @@ def st_records_and_queries(draw, max_nrows=10):
 
 @st.composite
 def st_feature_queries(draw):
-    """Create a metadata query pack for testing."""
+    """Create a feature metadata query pack for testing."""
 
     population_type = draw(st.sampled_from(POPULATION_TYPES))
     endpoint = draw(st.sampled_from(("area-types", "dimensions")))
@@ -87,54 +87,22 @@ def st_feature_queries(draw):
 
 
 @st.composite
-def st_area_types_info_and_queries(draw):
-    """Create the parameters and response for an area type query."""
+def st_category_queries(draw):
+    """Create a category metadata query pack for testing."""
 
     population_type = draw(st.sampled_from(POPULATION_TYPES))
+    feature = draw(st.sampled_from(("area-types", "dimensions")))
+    endpoint = "areas" if feature == "area-types" else "categorisations"
 
-    area_types_available = AREA_TYPES_BY_POPULATION_TYPE[population_type]
-    area_types = draw(
-        st.lists(
-            st.sampled_from(area_types_available),
-            min_size=0,
-            max_size=5,
-            unique=True,
-        )
+    items_by_population_type = (
+        AREA_TYPES_BY_POPULATION_TYPE
+        if feature == "area-types"
+        else DIMENSIONS_BY_POPULATION_TYPE
     )
+    possible_items = items_by_population_type[population_type]
+    item = draw(st.sampled_from(possible_items))
 
-    area_types_info = {
-        "items": [
-            {
-                "id": area_type,
-                "label": st.text(),
-                "description": st.text(),
-                "total_count": st.integers(),
-                "hierarchy_order": st.integers(),
-            }
-            for area_type in area_types_available
-        ]
-    }
+    num_items = draw(st.integers(1, 5))
+    items = [{"item": st.text()} for _ in range(num_items)]
 
-    return area_types_info, population_type, area_types
-
-
-@st.composite
-def st_area_type_areas_and_queries(draw):
-    """Create a set of area type areas and their query parameters."""
-
-    population_type = draw(st.sampled_from(POPULATION_TYPES))
-    area_type = draw(
-        st.sampled_from(AREA_TYPES_BY_POPULATION_TYPE[population_type])
-    )
-
-    num_items = draw(st.integers(min_value=1, max_value=5))
-    area_items = [
-        {
-            "id": draw(st.text()),
-            "label": draw(st.text()),
-            "area_type": area_type,
-        }
-        for _ in range(num_items)
-    ]
-
-    return area_items, population_type, area_type
+    return population_type, feature, item, endpoint, items
