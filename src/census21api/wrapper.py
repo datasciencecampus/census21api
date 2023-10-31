@@ -1,8 +1,8 @@
 """Module for the API wrapper."""
 
-import json
 import warnings
-from typing import Any, Dict, List, Optional
+from json import JSONDecodeError
+from typing import Any, Dict, List, Literal, Optional
 
 import pandas as pd
 import requests
@@ -72,7 +72,7 @@ class CensusAPI:
 
         try:
             data = response.json()
-        except json.JSONDecodeError as e:
+        except JSONDecodeError as e:
             if self._logger:
                 warnings.warn(
                     "\n".join(
@@ -153,6 +153,10 @@ class CensusAPI:
         """
         Query a custom table from the API.
 
+        This method connects to the `census-observations` endpoint
+        `/{population_type}/census-observations` with query parameters
+        `?area-type={area_type}&dimensions={','.join(dimensions)}`.
+
         Parameters
         ----------
         population_type : str
@@ -190,120 +194,15 @@ class CensusAPI:
 
             return data
 
-    def query_area_type_metadata(
-        self, population_type: str, *area_types: str
-    ) -> Optional[pd.DataFrame]:
-        """
-        Query the metadata on area type(s) for a population type.
-
-        Parameters
-        ----------
-        population_type : str
-            Population type of the area type(s) to be queried.
-        *area_types : str
-            Area type(s) to query. If none are specified, the querist
-            returns all available types for the population type. See
-            `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
-
-        Returns
-        -------
-        metadata : pd.DataFrame or None
-            Data frame of area type metadata if the call succeeds, and
-            `None` if not.
-        """
-
-        url = "/".join((API_ROOT, population_type, "area-types?limit=500"))
-        metadata_json = self.get(url)
-        metadata = None
-
-        if isinstance(metadata_json, dict) and "items" in metadata_json:
-            metadata = pd.json_normalize(metadata_json["items"])
-            metadata["population_type"] = population_type
-            if area_types:
-                metadata = metadata[metadata["id"].isin(area_types)]
-
-        return metadata
-
-    def _query_any_extra_area_items(
-        self, areas_json: Dict[str, Any], url: str
-    ) -> List[Dict]:
-        """
-        Query all the area type areas missed from the first call.
-
-        Some area types have hundreds or thousands of areas, and the API
-        has a hard limit on the size of its responses at 500. So, we use
-        this function to call the API with increasing offsets until we
-        have all the areas.
-
-        Parameters
-        ----------
-        areas_json : dict
-            JSON response from the first API area type areas call.
-        url : str
-            Base area type areas URL from which to query.
-
-        Returns
-        -------
-        items : list of dict
-            Area type area items.
-        """
-
-        items = areas_json["items"]
-        total_counted = areas_json["count"]
-        while total_counted < areas_json["total_count"]:
-            areas_json = self.get(url + f"&offset={total_counted}")
-            print(total_counted, items, areas_json["items"], sep="\n")
-            items.extend(areas_json["items"])
-            total_counted += areas_json["count"]
-        print(total_counted, items, "\n", sep="\n")
-
-        return items
-
-    def query_area_type_areas(
-        self, population_type: str, area_type: str
-    ) -> Optional[pd.DataFrame]:
-        """
-        Query the areas in an area type for a population type.
-
-        Parameters
-        ----------
-        population_type : str
-            Population type of the area type to be queried.
-        area_type : str
-            Area type whose areas will be queried.
-            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
-
-        Returns
-        -------
-        areas : pd.DataFrame or None
-            Data frame containing the area information if the call
-            succeeds, and `None` if not.
-        """
-
-        url = "/".join(
-            (
-                API_ROOT,
-                population_type,
-                "area-types",
-                area_type,
-                "areas?limit=500",
-            )
-        )
-        areas_json = self.get(url)
-        areas = None
-
-        if isinstance(areas_json, dict) and "items" in areas_json:
-            items = self._query_any_extra_area_items(areas_json, url)
-            areas = pd.json_normalize(items)
-            areas["population_type"] = population_type
-
-        return areas
-
-    def query_population_type_metadata(
+    def query_population_type(
         self, population_type: str
     ) -> Optional[pd.Series]:
         """
         Query the metadata for a population type.
+
+        This method connects to the `population-types` endpoint for a
+        population type (ie. `/{population_type}`) and returns a series
+        format of the metadata there.
 
         Parameters
         ----------
@@ -319,16 +218,110 @@ class CensusAPI:
         """
 
         url = "/".join((API_ROOT, population_type))
-        metadata_json = self.get(url)
+        json = self.get(url)
         metadata = None
 
-        if (
-            isinstance(metadata_json, dict)
-            and "population_type" in metadata_json
-        ):
-            metadata = pd.Series(metadata_json["population_type"])
+        if isinstance(json, dict) and "population_type" in json:
+            metadata = pd.Series(json["population_type"])
 
         return metadata
+
+    def query_feature(
+        self,
+        population_type: str,
+        feature: Literal["area-types", "dimensions"],
+        *items: str,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query metadata on a feature for a population type.
+
+        This method connects to the `area-types` and `dimensions`
+        endpoints (ie. `/{population_type}/{endpoint}`) and returns a
+        data frame format of the metadata there.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        feature : {"area-types", "dimensions"}
+            Endpoint of the feature to query.
+        *items : str
+            Items to query from the endpoint. If not specified,
+            return all items at the endpoint. For dimensions, see
+            `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`, and
+            `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE` for
+            area types.
+
+        Returns
+        -------
+        metadata : pd.DataFrame or None
+            Data frame with the metadata if the call succeeds, and
+            `None` if not.
+        """
+
+        url = "/".join((API_ROOT, population_type, f"{feature}?limit=500"))
+        json = self.get(url)
+        metadata = None
+
+        if isinstance(json, dict) and "items" in json:
+            metadata = pd.json_normalize(json["items"])
+            metadata["population_type"] = population_type
+            if items:
+                metadata = metadata[metadata["id"].isin(items)]
+
+        return metadata
+
+    def query_categories(
+        self,
+        population_type: str,
+        feature: Literal["area-types", "dimensions"],
+        item: str,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query metadata on the categories of a particular feature item.
+
+        This method connects to different endpoints depending on
+        `feature`:
+
+        - `/{population_type}/area-types/{item}/areas`
+        - `/{population_type}/dimensions/{item}/categorisations`
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        feature : {"area-types", "dimensions"}
+            Endpoint of the feature to query.
+        item : str
+            ID of the item in the feature to query.
+
+        Returns
+        -------
+        categories : pd.DataFrame or None
+            Metadata on the categories for the feature item if the call
+            succeeds, and `None` if not.
+        """
+
+        endpoint = "areas" if feature == "area-types" else "categorisations"
+        url = "/".join(
+            (API_ROOT, population_type, feature, item, f"{endpoint}?limit=500")
+        )
+        json = self.get(url)
+        categories = None
+
+        if isinstance(json, dict) and "items" in json:
+            items = json["items"]
+
+            total_counted = json["count"]
+            while total_counted < json["total_count"]:
+                json = self.get(url + f"&offset={total_counted}")
+                items.extend(json["items"])
+                total_counted += json["count"]
+
+            categories = pd.json_normalize(items)
+            categories["population_type"] = population_type
+
+        return categories
 
 
 def _extract_records_from_observations(
