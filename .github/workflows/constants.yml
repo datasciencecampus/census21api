@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - "dev*"
   schedule:
     - cron: '0 0 * * 1'
 
@@ -25,4 +28,4 @@ jobs:
 
       - name: Run API constants checker
         run: |
-          python check_api_constants.py
+          python check_constants.py

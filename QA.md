@@ -15,15 +15,15 @@ Quality assurance checklist from [the quality assurance of code for analysis and
 
 ### Project structure
 
-- [ ] A clear, standard directory structure is used to separate input data, outputs, code and documentation.
+- [x] A clear, standard directory structure is used to separate input data, outputs, code and documentation.
 
 ### Code documentation
 
 - [ ] Comments are used to describe why code is written in a particular way, rather than describing what the code is doing.
 - [ ] Comments are kept up to date, so they do not confuse the reader.
-- [ ] Code is not commented out to adjust which lines of code run.
-- [ ] All functions and classes are documented to describe what they do, what inputs they take and what they return.
-- [ ] Python code is [documented using docstrings](https://www.python.org/dev/peps/pep-0257/). R code is [documented using `roxygen2` comments](https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html).
+- [x] Code is not commented out to adjust which lines of code run.
+- [x] All functions and classes are documented to describe what they do, what inputs they take and what they return.
+- [x] Python code is [documented using docstrings](https://www.python.org/dev/peps/pep-0257/). R code is [documented using `roxygen2` comments](https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html).
 
 ### Project documentation
 
@@ -37,15 +37,15 @@ Quality assurance checklist from [the quality assurance of code for analysis and
 
 ### Version control
 
-- [ ] Code is [version controlled using Git](https://git-scm.com/).
-- [ ] Code is committed regularly, preferably when a discrete unit of work has been completed.
-- [ ] An appropriate branching strategy is defined and used throughout development.
-- [ ] Code is open-sourced. Any sensitive data are omitted or replaced with dummy data.
+- [x] Code is [version controlled using Git](https://git-scm.com/).
+- [x] Code is committed regularly, preferably when a discrete unit of work has been completed.
+- [x] An appropriate branching strategy is defined and used throughout development.
+- [x] Code is open-sourced. Any sensitive data are omitted or replaced with dummy data.
 
 ### Configuration
 
-- [ ] Credentials and other secrets are not written in code but are configured as environment variables.
-- [ ] Configuration is clearly separated from code used for analysis, so that it is simple to identify and update.
+- [x] Credentials and other secrets are not written in code but are configured as environment variables.
+- [x] Configuration is clearly separated from code used for analysis, so that it is simple to identify and update.
 - [ ] The configuration used to generate particular outputs, releases and publications is recorded.
 
 ### Data management
@@ -61,32 +61,32 @@ Quality assurance checklist from [the quality assurance of code for analysis and
 
 ### Peer review
 
-- [ ] Peer review is conducted and recorded near to the code. Merge or pull requests are used to document review, when relevant.
+- [x] Peer review is conducted and recorded near to the code. Merge or pull requests are used to document review, when relevant.
 
 ### Testing
 
-- [ ] Core functionality is unit tested as code. See [`pytest` for Python](https://docs.pytest.org/en/stable/) and [`testthat` for R](https://testthat.r-lib.org/). 
-- [ ] Code based tests are run regularly, ideally being automated using continuous integration.
-- [ ] Bug fixes include implementing new unit tests to ensure that the same bug does not reoccur.
+- [x] Core functionality is unit tested as code. See [`pytest` for Python](https://docs.pytest.org/en/stable/) and [`testthat` for R](https://testthat.r-lib.org/). 
+- [x] Code based tests are run regularly, ideally being automated using continuous integration.
+- [x] Bug fixes include implementing new unit tests to ensure that the same bug does not reoccur.
 - [ ] Informal tests are recorded near to the code.
 - [ ] Stakeholder or user acceptance sign-offs are recorded near to the code.
 
 ### Dependency management
 
 - [ ] Required passwords, secrets and tokens are documented, but are stored outside of version control.
-- [ ] Required libraries and packages are documented, including their versions.
-- [ ] Working operating system environments are documented.
+- [x] Required libraries and packages are documented, including their versions.
+- [x] Working operating system environments are documented.
 - [ ] Example configuration files are provided.
 
 ### Logging
 
-- [ ] Misuse or failure in the code produces informative error messages.
+- [x] Misuse or failure in the code produces informative error messages.
 - [ ] Code configuration is recorded when the code is run.
 
 ### Project management
 
 - [ ] The roles and responsibilities of team members are clearly defined.
 - [ ] An issue tracker (e.g GitHub Project, Trello or Jira) is used to record development tasks.
-- [ ] New issues or tasks are guided by users’ needs and stories.
+- [x] New issues or tasks are guided by users’ needs and stories.
 - [ ] Acceptance criteria are noted for issues and tasks. Fulfilment of acceptance criteria is recorded.
-- [ ] Quality assurance standards and processes for the project are defined. These are based around [the quality assurance of code for analysis and research guidance document](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html).
+- [x] Quality assurance standards and processes for the project are defined. These are based around [the quality assurance of code for analysis and research guidance document](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html).
