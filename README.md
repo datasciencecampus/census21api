@@ -1,4 +1,4 @@
-# `census21api`: accessing 2021 England and Wales Census "Create a Custom Dataset" API
+# `census21api`: a Python interface for the ONS "Create a Custom Dataset" API
 
 ## Overview
 
@@ -28,7 +28,7 @@ also require Python 3.8 or higher.
 To install from GitHub via `pip`:
 
 ```bash
-$ python -m pip install census21api@https://github.com/datasciencecampus/census21api.git
+$ python -m pip install census21api@git+https://github.com/datasciencecampus/census21api
 ```
 
 Or directly from source:
@@ -74,6 +74,30 @@ Here's a basic example of how to use the `CensusAPI` class to retrieve a table:
 11  W92000004   2                      1    101574           UR_HH
 
 ```
+
+## Limitations
+
+The `CensusAPI` class includes a variety of methods to interact with the API in
+a very flexible way. However, there are still some limitations when compared
+with the web interface; these come from the API itself, which is still in
+development.
+
+If you notice something wrong or something missing, consider making a
+contribution or opening an issue.
+
+### Blocked dimension combinations
+
+Some combinations of columns (dimensions) cannot be queried at once. See #39
+for an example. This is a deliberate block put in place by the developers of
+the API.
+
+### Some columns are missing
+
+Despite the stringent statistical disclosure control all public ONS tables go
+through, some dimensions are not available in the API. For instance, you cannot
+query tables containing age data despite being able to create them through the
+web interface. Again, this is a deliberate choice by the developers and may be
+subject to change.
 
 ## Contributing
 
