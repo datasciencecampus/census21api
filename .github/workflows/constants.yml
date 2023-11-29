@@ -1,0 +1,31 @@
+name: Constants
+
+on:
+  push:
+    branches:
+      - "dev*"
+  schedule:
+    - cron: '0 0 * * 1'
+
+jobs:
+  constants:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Update pip and install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+
+      - name: Run API constants checker
+        run: |
+          python check_constants.py

@@ -1,352 +1,357 @@
-import requests
-import json
+"""Module for the API wrapper."""
+
+import warnings
+from json import JSONDecodeError
+from typing import Any, Dict, List, Literal, Optional
+
 import pandas as pd
-from typing import List, Dict, Any, Set, Optional
+import requests
 from requests.models import Response
-import itertools
-import os
+
+from census21api.constants import API_ROOT
+
+DataLike = Optional[Dict[str, Any]]
 
 
-class APIWrapper:
+class CensusAPI:
+    """
+    A wrapper for the 2021 England and Wales Census API.
+
+    Parameters
+    ----------
+    logger : bool, default False
+        Whether to be verbose about issues when connecting to the API.
+
+    Attributes
+    ----------
+    _current_data : dict or None
+        Data dictionary from the most recent API call. If no call has
+        been made or the last call failed, this is `None`.
+    _current_url : str or None
+        URL of the most recent API call. If no call has been made, this
+        is `None`.
+    """
+
     def __init__(self, logger: bool = False) -> None:
-        self._logger = logger
-        self._current_data = None
-        self.set_root_string('https://api.beta.ons.gov.uk/v1/population-types')
-        self.set_population_types_available()
-        self.set_areas_by_pop_types()
-        self.set_dims_by_pop_types()
-        
+        self._logger: bool = logger
+        self._current_url: str = None
+        self._current_data: dict = None
 
-    def set_root_string(self, root_str: str) -> None:
+    def _process_response(self, response: Response) -> DataLike:
         """
-        set the root string for the API
-        """
-        self._root_string = root_str
-    
-    
-    def get_root_string(self) -> str:
-        """
-        getter function for the root string
-        """
-        return self._root_string
-    
-        
-    def _validate_status_code(self, response: Response) -> bool:
-        """
-        Checks response codes for https requests
-            Informational responses (100 – 199)
-            Successful responses (200 – 299)
-            Redirection messages (300 – 399)
-            Client error responses (400 – 499)
-            Server error responses (500 – 599)
+        Validate and extract data from a response.
 
-        Args:
-            response: requests HTTP response object.
+        Valid responses can be decoded from JSON and have a "successful"
+        status code (200-299).
 
-        Returns:
-            Boolean.
+        Parameters
+        ----------
+        response : requests.Response
+            Response to be processed.
+
+        Returns
+        -------
+        data : dict or None
+            Data dictionary if the response is valid and `None` if not.
         """
-        valid_response = 200 <= response.status_code <= 299
-        if self._logger and not valid_status_code:
-            print(f'response status code: {response.status_code} for url: {self._current_url}')        
-        return valid_response
 
-    
-    def _process_reponse(self, response: Response) -> Optional[Dict[str, Any]]:
-        """
-        get function with minimal validation.
-
-        Args:
-            response: Response = the response from the API call.
-
-        Returns:
-            dictionary of json format from api.       
-        """
-        if not self._validate_status_code(response):
-            return None
-        try:
-            data_out: Dict[str, Any] = response.json()
-        except json.JSONDecodeError as e:
-            data_out = None
+        data = None
+        if not 200 <= response.status_code <= 299:
             if self._logger:
-                print(f'{e} for url: {self._current_url} returning None')
-        return data_out
-    
+                warnings.warn(
+                    "\n".join(
+                        (
+                            f"Unsuccessful GET from {self._current_url}",
+                            f"Status code: {response.status_code}",
+                            response.body,
+                        )
+                    ),
+                    UserWarning,
+                )
+            return data
 
-    def get(self, url: str) -> Optional[Dict[str, Any]]:
-        """
-        get function with minimal validation.
+        try:
+            data = response.json()
+        except JSONDecodeError as e:
+            if self._logger:
+                warnings.warn(
+                    "\n".join(
+                        (
+                            f"Error decoding data from {self._current_url}:",
+                            str(e),
+                        )
+                    ),
+                    UserWarning,
+                )
 
-        Args:
-            url: str = the url for the API call.
-
-        Returns:
-            dictionary of json format from api.
-
-        Raises:
-            Doesn't raise an error but prints the url and the response code on failure.
-        """
-        self._current_url: str = url
-        response: Response = requests.get(url=self._current_url, verify=True)        
-        # checks if the response code was valid
-        self._current_data = self._process_reponse(response)
-        return self._current_data
-    
-    
-    def extract_pop_type_from_item(self, item: Dict[str, str]) -> str:
-        """
-        helper function for splitting pop type
-        """
-        return item["name"].split("-")[3].upper()
-    
-    
-    def set_population_types_available(self) -> List[str]:
-        """
-        Loops through the possible codes to see if returns data.
-        Saves successful codes to a list
-
-        Returns:
-            list of the successful population codes.
-        """        
-        
-        root_string: str = self.get_root_string()
-        self.get(root_string)
-
-        # list comprehension, splits out the suspected population codes from the longer call_code response
-        # converts to upper case to mirror upper case shown in the github demo found here: 
-            # https://github.com/GSS-Cogs/knowledge/blob/main/api/ons_local_census_api_walkthrough_python.ipynb
-        # converts to set to remove duplicates and back to list for easy manipulation
-        possible_codes: Set[str] = set([self.extract_pop_type_from_item(item) for item in self._current_data['items']])
-        working_pop_codes: List[str] = []
-
-        for cd in possible_codes:
-            search_string = f"{root_string}/{cd}"
-            self.get(search_string)
-
-            # if the attempt returns none we know get has failed
-            # sometimes the API returns a json with "errors" as a key
-            # that also counts as failing so we ignore that
-            if isinstance(self._current_data, dict) and "errors" not in self._current_data.keys():
-                working_pop_codes.append(cd)
-
-        self._valid_pop_types = working_pop_codes 
-    
-    
-    def get_population_types_available(self) -> List[str]:
-        return self._valid_pop_types
-    
-    
-    def get_parameters_available(self, pop_type: str, parameter_type: str) -> Dict[str, str]:
-        """
-        get the available parameters for either area-type or dimensions
-
-        Args:
-            pop_type: str = UR, HRP, HH
-            parameter_type: str = area-types, dimensions
-
-        Returns:
-            dictionary of descriptive name and relevant id.
-        """
-        # the API structure of parameter_type coming after population type means we can use the same \
-        # function for two calls, if this changes at some point this function will break
-        # TODO add some error checking for the pop and parameter type inputs
-        self.get(f"{self.get_root_string()}/{pop_type}/{parameter_type}")
-
-        # dictionary comprehension to connect the description with the useful id code
-        if isinstance(self._current_data['items'], list):
-            possible_params = {item['label'] : item['id'] for item in self._current_data['items']}  
-            return possible_params  
-        if self._logger:
-            print(f"Unable to iterate over NoneType for {pop_type = } and {parameter_type = }")
-    
-    
-    def set_areas_by_pop_types(self) -> None:
-        """
-        Loops over the valid pop types and creates a dict of valid area types for each of them
-        """
-        self._area_dict: Dict[str, str] = {}
-        
-        for pt in self._valid_pop_types:
-            self._area_dict[pt] = self.get_parameters_available(pt, 'area-types')
-    
-    
-    def set_dims_by_pop_types(self) -> None:
-        """
-        Loops over the valid pop types and creates a dict of valid dimensions for each of them
-        """        
-        self._dims_dict: Dict[str, str] = {}
-        
-        for pt in self._valid_pop_types:
-            self._dims_dict[pt] = self.get_parameters_available(pt, 'dimensions')
-      
-    
-    def get_areas_by_pop_type(self, pop_type: str) -> Dict[str, str]:
-        """
-        Returns:
-            a dictionary of available area codes for the input arg pop_type
-        """
-        return self._area_dict[pop_type]
-    
-    
-    def get_dims_by_pop_type(self, pop_type: str) -> Dict[str, str]:
-        """
-        Returns:
-            a dictionary of available dimensions for the input arg pop_type
-        """
-        return self._dims_dict[pop_type]    
-    
-    
-    def build_search_string(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None) -> str:
-        """
-        builds the url based on the search parameters
-
-        Args:
-            search_pop_type: str = the population code
-            search_dimensions: str = the dimensions
-            search_area_type: str = the area type
-
-        Returns:
-            the url for the API call
-        """    
-        # base string to build search off
-        search_string: str = f"{self.get_root_string()}/{search_pop_type}/census-observations?"
-
-        parameter_strings = (
-            f"{name}={param}"
-            for name, param in zip(("dimensions", "area-type"), (search_dimensions, search_area_type))
-            if param is not None
-        )
-        search_string += "&".join(parameter_strings)
-
-        return search_string  
-    
-
-    def query_api(self, search_pop_type: str, search_dimensions: str = None, search_area_type: str = None, create_csv: bool = True) -> pd.DataFrame:
-        """
-            wrapper function to query api
-
-        Args:
-            search_pop_type: str = the population code
-            search_dimensions: str = the dimensions
-            search_area_type: str = the area type
- 
-        Returns:
-            Dataframe for analysis.    
-        """
-        self._searched_dims = search_dimensions.split(',')
-        self._searched_area = search_area_type
-        search_string: str = self.build_search_string(search_pop_type, search_dimensions, search_area_type) 
-        self.get(search_string)
-        data = self.create_observation_df()
-        
-        if isinstance(data, pd.DataFrame) and create_csv:
-            folder_path = 'data/output/'
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path) 
-            data.to_csv(f"data/output/{search_pop_type}_{search_dimensions.replace(',','_')}_{search_area_type}.csv")
-            
         return data
-    
-    
-    def create_observation_df(self) -> pd.DataFrame:
+
+    def get(self, url: str) -> DataLike:
         """
-        builds the df for the data from the API
+        Make a call to, and retrieve some data from, the API.
 
-        Args:
-            returned_data_json: dict = the data returned by the search_string
+        Parameters
+        ----------
+        url : str
+            URL from which to retrieve data.
 
-        Returns:
-            Dataframe for analysis.    
+        Returns
+        -------
+        data : dict or None
+            JSON data from the response of this API call if it is
+            successful, and `None` otherwise.
         """
-        # to make the program flow continue for mass testing
-        if (self._current_data is None) or (self._current_data['observations'] is None):
-            return None
-        
-        # we only want the observations data
-        data: Dict[str, Any] = self._current_data['observations']
 
-        data_list: List[Dict[str, Any]] = []
+        self._current_url = url
+        response = requests.get(url, verify=True)
 
-        for item_dict in data:
-            # this temp dict will make each row of our dataframe
-            inner_dict = {}
+        data = self._process_response(response)
+        self._current_data = data
 
-            for sub_item in item_dict['dimensions']:
-                # dimension_id holds the name of the dimension, option_id is the response
-                # option = the word description of the value
-                # option_id = the ONS encoding for that item
-                inner_dict[sub_item['dimension_id']] = sub_item['option']
-                inner_dict[f'{sub_item["dimension_id"]}_id'] = sub_item['option_id']
+        return self._current_data
 
-            # the count of observations for this dimension_id and option_id
-            inner_dict['count'] = item_dict['observation'] 
-
-            # add row of data to list
-            data_list.append(inner_dict)
-
-        self._query_df = pd.DataFrame(data_list)
-        return self._query_df
-
-    
-    def get_summary_by_dimensions(self) -> Dict[str, pd.DataFrame]:
+    def _query_table_json(
+        self, population_type: str, area_type: str, dimensions: List[str]
+    ) -> DataLike:
         """
-            builds and returns summaries of the data grouped by dimension
-         
-        Returns:
-            a dict of both absolute counts for each dimension and proportions
-            normalised by the total.    
-        """        
-        if self._query_df is None:
-            print('No query data available to summarise.')
-            return None
-        
-        self._groupby_dim_dict = {}
-        for dim in self._searched_dims:
-            groupby_ = self._query_df.groupby(dim)[['count']].sum()
-            denom = groupby_.sum()
-            self._groupby_dim_dict[dim] = groupby_
-            self._groupby_dim_dict[f'{dim}_normalised'] = groupby_ / denom
-            
-        return self._groupby_dim_dict
-    
-    
-    def get_summary_by_area(self) -> Dict[str, pd.DataFrame]:
+        Retrieve the JSON for a table query from the API.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+            See `census21api.constants.POPULATION_TYPES`.
+        area_type : str
+            Area type to query.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
+        dimensions : list of str
+            Dimensions to query.
+            See `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`.
+
+        Returns
+        -------
+        data : dict or None
+            JSON data from the API call if it is successful, and `None`
+            otherwise.
         """
-            builds and returns summaries of the data grouped by area
-         
-        Returns:
-            a dict of both absolute counts for each area and proportions
-            normalised by the total.    
-        """        
-        if self._query_df is None:
-            print('No query data available to summarise.')
-            return None
-        
-        self._groupby_area_dict = {}
-        groupby_ = self._query_df.groupby(self._searched_area)[['count']].sum()
-        denom = groupby_.sum()
-        self._groupby_area_dict[self._searched_area] = groupby_
-        self._groupby_area_dict[f'{self._searched_area}_normalised'] = groupby_ / denom
-            
-        return self._groupby_area_dict
-    
-    
-    def loop_through_variables(self, residence_code, region):
-        '''
-        Collects data for all variable combinations relating to residence/region
-            
-        Args:
-            residence_code: str = code relating to residence, eg. 'HH', 'UR'
-            region: str = regional code relating to region, eg. 'rgns'
-            
-        Returns:
-            .csv file for all possible combinations    
-        '''   
-        dims = list(self.get_dims_by_pop_type(residence_code).values())
-        combos = [sorted(i) for i in itertools.product(dims, dims)]
-        trimmed_combos = sorted(list(map(list, set(map(frozenset, combos)))))
-        no_single_searches = [i for i in trimmed_combos if len(i) == 2]
-        
-        for combination in no_single_searches:
-            stripped_string = ','.join(combination)
-            data = self.query_api(residence_code, stripped_string, region)
+
+        base = "/".join((API_ROOT, population_type, "census-observations"))
+        parameters = f"area-type={area_type}&dimensions={','.join(dimensions)}"
+        url = "?".join((base, parameters))
+
+        data = self.get(url)
+
+        return data
+
+    def query_table(
+        self,
+        population_type: str,
+        area_type: str,
+        dimensions: List[str],
+        use_id: bool = True,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query a custom table from the API.
+
+        This method connects to the `census-observations` endpoint
+        `/{population_type}/census-observations` with query parameters
+        `?area-type={area_type}&dimensions={','.join(dimensions)}`.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+            See `census21api.constants.POPULATION_TYPES`.
+        area_type : str
+            Area type to query.
+            See `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE`.
+        dimensions : list of str
+            Dimensions to query.
+            See `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`.
+        use_id : bool, default True
+            If `True` (the default) use the ID for each dimension and
+            area type. Otherwise, use the full label.
+
+        Returns
+        -------
+        data : pandas.DataFrame or None
+            Data frame containing the data from the API call if it is
+            successful, and `None` otherwise.
+        """
+
+        table_json = self._query_table_json(
+            population_type, area_type, dimensions
+        )
+        data = None
+
+        if isinstance(table_json, dict) and "observations" in table_json:
+            records = _extract_records_from_observations(
+                table_json["observations"], use_id
+            )
+            columns = (area_type, *dimensions, "count")
+            data = pd.DataFrame(records, columns=columns)
+            data["population_type"] = population_type
+
+            return data
+
+    def query_population_type(
+        self, population_type: str
+    ) -> Optional[pd.Series]:
+        """
+        Query the metadata for a population type.
+
+        This method connects to the `population-types` endpoint for a
+        population type (ie. `/{population_type}`) and returns a series
+        format of the metadata there.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to be queried.
+            See `census21api.constants.POPULATION_TYPES`.
+
+        Returns
+        -------
+        metadata : pd.Series or None
+            Series with the population type metadata if the call
+            succeeds, and `None` if not.
+        """
+
+        url = "/".join((API_ROOT, population_type))
+        json = self.get(url)
+        metadata = None
+
+        if isinstance(json, dict) and "population_type" in json:
+            metadata = pd.Series(json["population_type"])
+
+        return metadata
+
+    def query_feature(
+        self,
+        population_type: str,
+        feature: Literal["area-types", "dimensions"],
+        *items: str,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query metadata on a feature for a population type.
+
+        This method connects to the `area-types` and `dimensions`
+        endpoints (ie. `/{population_type}/{endpoint}`) and returns a
+        data frame format of the metadata there.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        feature : {"area-types", "dimensions"}
+            Endpoint of the feature to query.
+        *items : str
+            Items to query from the endpoint. If not specified,
+            return all items at the endpoint. For dimensions, see
+            `census21api.constants.DIMENSIONS_BY_POPULATION_TYPE`, and
+            `census21api.constants.AREA_TYPES_BY_POPULATION_TYPE` for
+            area types.
+
+        Returns
+        -------
+        metadata : pd.DataFrame or None
+            Data frame with the metadata if the call succeeds, and
+            `None` if not.
+        """
+
+        url = "/".join((API_ROOT, population_type, f"{feature}?limit=500"))
+        json = self.get(url)
+        metadata = None
+
+        if isinstance(json, dict) and "items" in json:
+            metadata = pd.json_normalize(json["items"])
+            metadata["population_type"] = population_type
+            if items:
+                metadata = metadata[metadata["id"].isin(items)]
+
+        return metadata
+
+    def query_categories(
+        self,
+        population_type: str,
+        feature: Literal["area-types", "dimensions"],
+        item: str,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Query metadata on the categories of a particular feature item.
+
+        This method connects to different endpoints depending on
+        `feature`:
+
+        - `/{population_type}/area-types/{item}/areas`
+        - `/{population_type}/dimensions/{item}/categorisations`
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        feature : {"area-types", "dimensions"}
+            Endpoint of the feature to query.
+        item : str
+            ID of the item in the feature to query.
+
+        Returns
+        -------
+        categories : pd.DataFrame or None
+            Metadata on the categories for the feature item if the call
+            succeeds, and `None` if not.
+        """
+
+        endpoint = "areas" if feature == "area-types" else "categorisations"
+        url = "/".join(
+            (API_ROOT, population_type, feature, item, f"{endpoint}?limit=500")
+        )
+        json = self.get(url)
+        categories = None
+
+        if isinstance(json, dict) and "items" in json:
+            items = json["items"]
+
+            total_counted = json["count"]
+            while total_counted < json["total_count"]:
+                json = self.get(url + f"&offset={total_counted}")
+                items.extend(json["items"])
+                total_counted += json["count"]
+
+            categories = pd.json_normalize(items)
+            categories["population_type"] = population_type
+
+        return categories
+
+
+def _extract_records_from_observations(
+    observations: List[Dict[str, Any]], use_id: bool
+) -> List[tuple]:
+    """
+    Extract record information from a set of JSON observations.
+
+    Parameters
+    ----------
+    observations : dict
+        Dictionary of dimension options and count for the observation.
+    use_id : bool
+        If `True`, use the ID for each dimension option and area type.
+        Otherwise, use the full label.
+
+    Returns
+    -------
+    records : list of tuple
+        List of records to be formed into a data frame.
+    """
+
+    option = f"option{'_id' * use_id}"
+
+    records = []
+    for observation in observations:
+        record = (
+            *(dimension[option] for dimension in observation["dimensions"]),
+            observation["observation"],
+        )
+        records.append(record)
+
+    return records
