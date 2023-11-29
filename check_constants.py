@@ -25,8 +25,8 @@ def _check_population_types():
     assert available_pop_types == set(POPULATION_TYPES), "\n".join(
         (
             "Population types do not match.",
-            f"Available: {', '.join(available_pop_types)}",
-            f"Recorded: {', '.join(POPULATION_TYPES)}",
+            f"Available: {', '.join(sorted(available_pop_types))}",
+            f"Recorded: {', '.join(sorted(POPULATION_TYPES))}",
         )
     )
 
@@ -53,8 +53,8 @@ def _check_feature_by_population_type(feature):
         assert available == set(recorded), "\n".join(
             (
                 f"{text} for population type {pop_type} do not match.",
-                f"Available: {', '.join(available)}",
-                f"Recorded:  {', '.join(recorded)}",
+                f"Available: {', '.join(sorted(available))}",
+                f"Recorded:  {', '.join(sorted(recorded))}",
             )
         )
 
