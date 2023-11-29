@@ -35,12 +35,15 @@ lint = [
     "black<24",
     "ruff",
 ]
+docs = [
+    "quartodoc>=0.5.0"
+]
 dev = [
-    "census21api[test,lint]",
+    "census21api[test,lint,docs]",
 ]
 
 [project.urls]
-homepage = "https://github.com/MichaelaLawrenceONS/Census21_CACD_Wrapper"
+homepage = "https://github.com/datasciencecampus/census21api"
 
 [tool.black]
 line-length = 79
