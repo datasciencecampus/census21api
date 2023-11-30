@@ -115,9 +115,9 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="census21api.CensusAPI" class="level1">
+<section id="census21api.wrapper.CensusAPI" class="level1">
 <h1>CensusAPI</h1>
-<p><code>CensusAPI(self, logger=False)</code></p>
+<p><code>wrapper.CensusAPI(self, logger=False)</code></p>
 <p>A wrapper for the 2021 England and Wales Census API.</p>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
@@ -174,8 +174,350 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#census21api.wrapper.CensusAPI.get">get</a></td>
+<td>Make a call to, and retrieve some data from, the API.</td>
+</tr>
+<tr class="even">
+<td><a href="#census21api.wrapper.CensusAPI.query_categories">query_categories</a></td>
+<td>Query metadata on the categories of a particular feature item.</td>
+</tr>
+<tr class="odd">
+<td><a href="#census21api.wrapper.CensusAPI.query_feature">query_feature</a></td>
+<td>Query metadata on a feature for a population type.</td>
+</tr>
+<tr class="even">
+<td><a href="#census21api.wrapper.CensusAPI.query_population_type">query_population_type</a></td>
+<td>Query the metadata for a population type.</td>
+</tr>
+<tr class="odd">
+<td><a href="#census21api.wrapper.CensusAPI.query_table">query_table</a></td>
+<td>Query a custom table from the API.</td>
+</tr>
+</tbody>
+</table>
+<section id="census21api.wrapper.CensusAPI.get" class="level3">
+<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.get">get</h3>
+<p><code>wrapper.CensusAPI.get(url)</code></p>
+<p>Make a call to, and retrieve some data from, the API.</p>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>url</code></td>
+<td>str</td>
+<td>URL from which to retrieve data.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4">
+<h4 class="anchored" data-anchor-id="returns">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 86%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dict or None</td>
+<td>JSON data from the response of this API call if it is successful, and <code>None</code> otherwise.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="census21api.wrapper.CensusAPI.query_categories" class="level3">
+<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.query_categories">query_categories</h3>
+<p><code>wrapper.CensusAPI.query_categories(population_type, feature, item)</code></p>
+<p>Query metadata on the categories of a particular feature item.</p>
+<p>This method connects to different endpoints depending on <code>feature</code>:</p>
+<ul>
+<li><code>/{population_type}/area-types/{item}/areas</code></li>
+<li><code>/{population_type}/dimensions/{item}/categorisations</code></li>
+</ul>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 26%">
+<col style="width: 39%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>population_type</code></td>
+<td>str</td>
+<td>Population type to query.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>feature</code></td>
+<td>(area - types, dimensions)</td>
+<td>Endpoint of the feature to query.</td>
+<td><code>"area-types"</code></td>
+</tr>
+<tr class="odd">
+<td><code>item</code></td>
+<td>str</td>
+<td>ID of the item in the feature to query.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4">
+<h4 class="anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pandas.pandas.DataFrame or None</td>
+<td>Metadata on the categories for the feature item if the call succeeds, and <code>None</code> if not.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="census21api.wrapper.CensusAPI.query_feature" class="level3">
+<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.query_feature">query_feature</h3>
+<p><code>wrapper.CensusAPI.query_feature(population_type, feature, *items)</code></p>
+<p>Query metadata on a feature for a population type.</p>
+<p>This method connects to the <code>area-types</code> and <code>dimensions</code> endpoints (ie. <code>/{population_type}/{endpoint}</code>) and returns a data frame format of the metadata there.</p>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 78%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>population_type</code></td>
+<td>str</td>
+<td>Population type to query.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>feature</code></td>
+<td>(area - types, dimensions)</td>
+<td>Endpoint of the feature to query.</td>
+<td><code>"area-types"</code></td>
+</tr>
+<tr class="odd">
+<td><code>*items</code></td>
+<td>str</td>
+<td>Items to query from the endpoint. If not specified, return all items at the endpoint. For dimensions, see <code>census21api.constants.DIMENSIONS_BY_POPULATION_TYPE</code>, and <code>census21api.constants.AREA_TYPES_BY_POPULATION_TYPE</code> for area types.</td>
+<td><code>()</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4">
+<h4 class="anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 68%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pandas.pandas.DataFrame or None</td>
+<td>Data frame with the metadata if the call succeeds, and <code>None</code> if not.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="census21api.wrapper.CensusAPI.query_population_type" class="level3">
+<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.query_population_type">query_population_type</h3>
+<p><code>wrapper.CensusAPI.query_population_type(population_type)</code></p>
+<p>Query the metadata for a population type.</p>
+<p>This method connects to the <code>population-types</code> endpoint for a population type (ie. <code>/{population_type}</code>) and returns a series format of the metadata there.</p>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 66%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>population_type</code></td>
+<td>str</td>
+<td>Population type to be queried. See <code>census21api.constants.POPULATION_TYPES</code>.</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level4">
+<h4 class="anchored" data-anchor-id="returns-3">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pandas.pandas.Series or None</td>
+<td>Series with the population type metadata if the call succeeds, and <code>None</code> if not.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="census21api.wrapper.CensusAPI.query_table" class="level3">
+<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.query_table">query_table</h3>
+<p><code>wrapper.CensusAPI.query_table(population_type, area_type, dimensions, use_id=True)</code></p>
+<p>Query a custom table from the API.</p>
+<p>This method connects to the <code>census-observations</code> endpoint <code>/{population_type}/census-observations</code> with query parameters <code>?area-type={area_type}&amp;dimensions={','.join(dimensions)}</code>.</p>
+<section id="parameters-5" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 8%">
+<col style="width: 69%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>population_type</code></td>
+<td>str</td>
+<td>Population type to query. See <code>census21api.constants.POPULATION_TYPES</code>.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>area_type</code></td>
+<td>str</td>
+<td>Area type to query. See <code>census21api.constants.AREA_TYPES_BY_POPULATION_TYPE</code>.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td><code>dimensions</code></td>
+<td>list of str</td>
+<td>Dimensions to query. See <code>census21api.constants.DIMENSIONS_BY_POPULATION_TYPE</code>.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>use_id</code></td>
+<td>bool</td>
+<td>If <code>True</code> (the default) use the ID for each dimension and area type. Otherwise, use the full label.</td>
+<td><code>True</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-4" class="level4">
+<h4 class="anchored" data-anchor-id="returns-4">Returns</h4>
+<table class="table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pandas.pandas.DataFrame or None</td>
+<td>Data frame containing the data from the API call if it is successful, and <code>None</code> otherwise.</td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
+</section>
 </section>
 </section>
 
