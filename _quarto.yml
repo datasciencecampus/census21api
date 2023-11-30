@@ -33,5 +33,6 @@ quartodoc:
   sections:
     - title: CensusAPI
       desc: Core class for connecting to the Census API.
+      package: census21api.wrapper
       contents:
         - CensusAPI
