@@ -3,10 +3,35 @@ title: Welcome to the `census21api` documentation!
 toc: false
 about:
     id: welcome
+    template: marquee
     links:
         - icon: github
           href: https://github.com/datasciencecampus/census21api
+          text: GitHub
 ---
 
-:::{#welcome}
-:::
+## What is this and why does it exist?
+
+This package, `census21api`, is the (unofficial) Python interface to the
+["Create a Custom Dataset"](https://www.ons.gov.uk/datasets/create) web tool
+for the 2021 England and Wales Census.
+
+The primary goal of this project is to streamline the process of accessing and
+working with data from the 2021 England and Wales Census API. With
+`census21api`, you can create pretty much any Census tables you like in a
+programmatic way.
+
+## Who made this?
+
+The package and its documentation were developed by the 2023 cohort of Office
+for National Statistics data engineering and architecture apprentices -- with
+support from the [Data Science Campus](https://datasciencecampus.ons.gov.uk).
+
+See our [citation file](https://github.com/datasciencecampus/census21api/blob/main/CITATION.cff)
+for a list of our authors.
+
+## Where do I go now?
+
+Get stuck in with the package by checking out our
+[tutorials](docs/tutorials/index.qmd). For closer details, consider our
+[API reference](docs/reference/index.qmd).
