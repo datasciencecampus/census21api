@@ -1,0 +1,163 @@
+[
+  {
+    "objectID": "QA.html",
+    "href": "QA.html",
+    "title": "`census21api`",
+    "section": "",
+    "text": "Quality assurance checklist from the quality assurance of code for analysis and research guidance.\n\n\n\nIndividual pieces of logic are written as functions. Classes are used if more appropriate.\nRepetition in the code is minimalised. For example, by moving reusable code into functions or classes.\n\n\n\n\n\nNames used in the code are informative and concise.\nCode logic is clear and avoids unnecessary complexity.\nCode follows a standard style, e.g. PEP8 for Python and Google or tidyverse for R.\n\n\n\n\n\nA clear, standard directory structure is used to separate input data, outputs, code and documentation.\n\n\n\n\n\nComments are used to describe why code is written in a particular way, rather than describing what the code is doing.\nComments are kept up to date, so they do not confuse the reader.\nCode is not commented out to adjust which lines of code run.\nAll functions and classes are documented to describe what they do, what inputs they take and what they return.\nPython code is documented using docstrings. R code is documented using roxygen2 comments.\n\n\n\n\n\nA README file details the purpose of the project, basic installation instructions, and examples of usage.\nWhere appropriate, guidance for prospective contributors is available including a code of conduct.\nIf the code’s users are not familiar with the code, desk instructions are provided to guide lead users through example use cases.\nThe extent of analytical quality assurance conducted on the project is clearly documented.\nAssumptions in the analysis and their quality are documented next to the code that implements them. These are also made available to users.\nCopyright and licenses are specified for both documentation and code.\nInstructions for how to cite the project are given.\n\n\n\n\n\nCode is version controlled using Git.\nCode is committed regularly, preferably when a discrete unit of work has been completed.\nAn appropriate branching strategy is defined and used throughout development.\nCode is open-sourced. Any sensitive data are omitted or replaced with dummy data.\n\n\n\n\n\nCredentials and other secrets are not written in code but are configured as environment variables.\nConfiguration is clearly separated from code used for analysis, so that it is simple to identify and update.\nThe configuration used to generate particular outputs, releases and publications is recorded.\n\n\n\n\n\nPublished outputs meet accessibility regulations.\nAll data for analysis are stored in an open format, so that specific software is not required to access them.\nInput data are stored safely and are treated as read-only.\nInput data are versioned. All changes to the data result in new versions being created, or changes are recorded as new records.\nAll input data is documented in a data register, including where they come from and their importance to the analysis.\nOutputs from your analysis are disposable and are regularly deleted and regenerated while analysis develops. Your analysis code is able to reproduce them at any time.\nNon-sensitive data are made available to users. If data are sensitive, dummy data is made available so that the code can be run by others.\nData quality is monitored, as per the government data quality framework.\n\n\n\n\n\nPeer review is conducted and recorded near to the code. Merge or pull requests are used to document review, when relevant.\n\n\n\n\n\nCore functionality is unit tested as code. See pytest for Python and testthat for R.\nCode based tests are run regularly, ideally being automated using continuous integration.\nBug fixes include implementing new unit tests to ensure that the same bug does not reoccur.\nInformal tests are recorded near to the code.\nStakeholder or user acceptance sign-offs are recorded near to the code.\n\n\n\n\n\nRequired passwords, secrets and tokens are documented, but are stored outside of version control.\nRequired libraries and packages are documented, including their versions.\nWorking operating system environments are documented.\nExample configuration files are provided.\n\n\n\n\n\nMisuse or failure in the code produces informative error messages.\nCode configuration is recorded when the code is run.\n\n\n\n\n\nThe roles and responsibilities of team members are clearly defined.\nAn issue tracker (e.g GitHub Project, Trello or Jira) is used to record development tasks.\nNew issues or tasks are guided by users’ needs and stories.\nAcceptance criteria are noted for issues and tasks. Fulfilment of acceptance criteria is recorded.\nQuality assurance standards and processes for the project are defined. These are based around the quality assurance of code for analysis and research guidance document."
+  },
+  {
+    "objectID": "QA.html#quality-assurance-checklist",
+    "href": "QA.html#quality-assurance-checklist",
+    "title": "`census21api`",
+    "section": "",
+    "text": "Quality assurance checklist from the quality assurance of code for analysis and research guidance.\n\n\n\nIndividual pieces of logic are written as functions. Classes are used if more appropriate.\nRepetition in the code is minimalised. For example, by moving reusable code into functions or classes.\n\n\n\n\n\nNames used in the code are informative and concise.\nCode logic is clear and avoids unnecessary complexity.\nCode follows a standard style, e.g. PEP8 for Python and Google or tidyverse for R.\n\n\n\n\n\nA clear, standard directory structure is used to separate input data, outputs, code and documentation.\n\n\n\n\n\nComments are used to describe why code is written in a particular way, rather than describing what the code is doing.\nComments are kept up to date, so they do not confuse the reader.\nCode is not commented out to adjust which lines of code run.\nAll functions and classes are documented to describe what they do, what inputs they take and what they return.\nPython code is documented using docstrings. R code is documented using roxygen2 comments.\n\n\n\n\n\nA README file details the purpose of the project, basic installation instructions, and examples of usage.\nWhere appropriate, guidance for prospective contributors is available including a code of conduct.\nIf the code’s users are not familiar with the code, desk instructions are provided to guide lead users through example use cases.\nThe extent of analytical quality assurance conducted on the project is clearly documented.\nAssumptions in the analysis and their quality are documented next to the code that implements them. These are also made available to users.\nCopyright and licenses are specified for both documentation and code.\nInstructions for how to cite the project are given.\n\n\n\n\n\nCode is version controlled using Git.\nCode is committed regularly, preferably when a discrete unit of work has been completed.\nAn appropriate branching strategy is defined and used throughout development.\nCode is open-sourced. Any sensitive data are omitted or replaced with dummy data.\n\n\n\n\n\nCredentials and other secrets are not written in code but are configured as environment variables.\nConfiguration is clearly separated from code used for analysis, so that it is simple to identify and update.\nThe configuration used to generate particular outputs, releases and publications is recorded.\n\n\n\n\n\nPublished outputs meet accessibility regulations.\nAll data for analysis are stored in an open format, so that specific software is not required to access them.\nInput data are stored safely and are treated as read-only.\nInput data are versioned. All changes to the data result in new versions being created, or changes are recorded as new records.\nAll input data is documented in a data register, including where they come from and their importance to the analysis.\nOutputs from your analysis are disposable and are regularly deleted and regenerated while analysis develops. Your analysis code is able to reproduce them at any time.\nNon-sensitive data are made available to users. If data are sensitive, dummy data is made available so that the code can be run by others.\nData quality is monitored, as per the government data quality framework.\n\n\n\n\n\nPeer review is conducted and recorded near to the code. Merge or pull requests are used to document review, when relevant.\n\n\n\n\n\nCore functionality is unit tested as code. See pytest for Python and testthat for R.\nCode based tests are run regularly, ideally being automated using continuous integration.\nBug fixes include implementing new unit tests to ensure that the same bug does not reoccur.\nInformal tests are recorded near to the code.\nStakeholder or user acceptance sign-offs are recorded near to the code.\n\n\n\n\n\nRequired passwords, secrets and tokens are documented, but are stored outside of version control.\nRequired libraries and packages are documented, including their versions.\nWorking operating system environments are documented.\nExample configuration files are provided.\n\n\n\n\n\nMisuse or failure in the code produces informative error messages.\nCode configuration is recorded when the code is run.\n\n\n\n\n\nThe roles and responsibilities of team members are clearly defined.\nAn issue tracker (e.g GitHub Project, Trello or Jira) is used to record development tasks.\nNew issues or tasks are guided by users’ needs and stories.\nAcceptance criteria are noted for issues and tasks. Fulfilment of acceptance criteria is recorded.\nQuality assurance standards and processes for the project are defined. These are based around the quality assurance of code for analysis and research guidance document."
+  },
+  {
+    "objectID": "docs/reference/index.html",
+    "href": "docs/reference/index.html",
+    "title": "API reference",
+    "section": "",
+    "text": "Core class for connecting to the Census API.\n\n\n\nCensusAPI\nA wrapper for the 2021 England and Wales Census API."
+  },
+  {
+    "objectID": "docs/reference/index.html#censusapi",
+    "href": "docs/reference/index.html#censusapi",
+    "title": "API reference",
+    "section": "",
+    "text": "Core class for connecting to the Census API.\n\n\n\nCensusAPI\nA wrapper for the 2021 England and Wales Census API."
+  },
+  {
+    "objectID": "docs/tutorials/installation.html",
+    "href": "docs/tutorials/installation.html",
+    "title": "Installing the package",
+    "section": "",
+    "text": "Currently, the census21api package is only installable through GitHub. We also require Python 3.8 or higher."
+  },
+  {
+    "objectID": "docs/tutorials/installation.html#installing-from-github-via-pip",
+    "href": "docs/tutorials/installation.html#installing-from-github-via-pip",
+    "title": "Installing the package",
+    "section": "Installing from GitHub via pip",
+    "text": "Installing from GitHub via pip\nTo install from GitHub via pip, use the following command:\n$ python -m pip install census21api@git+https://github.com/datasciencecampus/census21api"
+  },
+  {
+    "objectID": "docs/tutorials/installation.html#installing-from-source",
+    "href": "docs/tutorials/installation.html#installing-from-source",
+    "title": "Installing the package",
+    "section": "Installing from source",
+    "text": "Installing from source\nIf you would prefer to install directly from source, use the following commands:\n$ git clone https://github.com/datasciencecampus/census21api.git\n$ cd census21api\n$ python -m pip install ."
+  },
+  {
+    "objectID": "docs/tutorials/installation.html#installing-to-contribute",
+    "href": "docs/tutorials/installation.html#installing-to-contribute",
+    "title": "Installing the package",
+    "section": "Installing to contribute",
+    "text": "Installing to contribute\nIf you intend on doing any sort of development on census21api - like writing documentation or implementing a new feature - it is highly recommended to install from source as editable and with the development dependencies.\nTo do so, make a fork of the repository and then run the following:\n$ git clone https://github.com/&lt;your-username&gt;/census21api.git\n$ cd census21api\n$ python -m pip install -e \".[dev]\""
+  },
+  {
+    "objectID": "CHANGES.html",
+    "href": "CHANGES.html",
+    "title": "Change log",
+    "section": "",
+    "text": "First release. See README for details on installation and use."
+  },
+  {
+    "objectID": "CHANGES.html#section",
+    "href": "CHANGES.html#section",
+    "title": "Change log",
+    "section": "",
+    "text": "First release. See README for details on installation and use."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to the census21api documentation!",
+    "section": "",
+    "text": "This package, census21api, is the (unofficial) Python interface to the “Create a Custom Dataset” web tool for the 2021 England and Wales Census.\nThe primary goal of this project is to streamline the process of accessing and working with data from the 2021 England and Wales Census API. With census21api, you can create pretty much any Census tables you like in a programmatic way."
+  },
+  {
+    "objectID": "index.html#what-is-this-and-why-does-it-exist",
+    "href": "index.html#what-is-this-and-why-does-it-exist",
+    "title": "Welcome to the census21api documentation!",
+    "section": "",
+    "text": "This package, census21api, is the (unofficial) Python interface to the “Create a Custom Dataset” web tool for the 2021 England and Wales Census.\nThe primary goal of this project is to streamline the process of accessing and working with data from the 2021 England and Wales Census API. With census21api, you can create pretty much any Census tables you like in a programmatic way."
+  },
+  {
+    "objectID": "index.html#who-made-this",
+    "href": "index.html#who-made-this",
+    "title": "Welcome to the census21api documentation!",
+    "section": "Who made this?",
+    "text": "Who made this?\nThe package and its documentation were developed by the 2023 cohort of Office for National Statistics data engineering and architecture apprentices – with support from the Data Science Campus.\nSee our citation file for a list of our authors."
+  },
+  {
+    "objectID": "index.html#where-do-i-go-now",
+    "href": "index.html#where-do-i-go-now",
+    "title": "Welcome to the census21api documentation!",
+    "section": "Where do I go now?",
+    "text": "Where do I go now?\nGet stuck in with the package by checking out our tutorials. For closer details, consider our API reference."
+  },
+  {
+    "objectID": "docs/tutorials/index.html",
+    "href": "docs/tutorials/index.html",
+    "title": "Tutorials",
+    "section": "",
+    "text": "In these tutorials, we walk through how to install the package and perform some basic workflows to interact with Census data.\n\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nTitle\n\n\nDescription\n\n\n\n\n\n\nInstalling the package\n\n\nInstructions for the various ways you can install the census21api package \n\n\n\n\nGetting started\n\n\nA typical workflow with the package, creating a single table\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "docs/tutorials/getting-started.html",
+    "href": "docs/tutorials/getting-started.html",
+    "title": "Getting started",
+    "section": "",
+    "text": "In this tutorial, we go over the typical sort of interaction a user will have with the package: retrieving a table from the API."
+  },
+  {
+    "objectID": "docs/tutorials/getting-started.html#making-a-connection",
+    "href": "docs/tutorials/getting-started.html#making-a-connection",
+    "title": "Getting started",
+    "section": "Making a connection",
+    "text": "Making a connection\nWe begin by importing the CensusAPI class from the package and creating an instance of it. This class is how we connect to the custom table creator API.\n\nfrom census21api import CensusAPI\n\napi = CensusAPI()"
+  },
+  {
+    "objectID": "docs/tutorials/getting-started.html#defining-a-query",
+    "href": "docs/tutorials/getting-started.html#defining-a-query",
+    "title": "Getting started",
+    "section": "Defining a query",
+    "text": "Defining a query\nNow, to query a table, we need three parameters:\n\na population type (e.g. household reference persons, usual residents)\nan area type (e.g. local authorities, Senedd electoral regions)\nsome dimensions (e.g. english proficiency, economic activity)\n\nLet’s say we are interested in the relationship between binary sex and health across the regions of England and Wales. Then our parameters are:\n\npopulation type: usual residents in the UK\narea type: region\ndimensions: sex and health in general"
+  },
+  {
+    "objectID": "docs/tutorials/getting-started.html#retrieving-a-table",
+    "href": "docs/tutorials/getting-started.html#retrieving-a-table",
+    "title": "Getting started",
+    "section": "Retrieving a table",
+    "text": "Retrieving a table\nWith that information, we can use our CensusAPI instance to retrieve the corresponding table from the API using its query_table() method:\n\npopulation_type = \"UR\"\narea_type = \"rgn\"\ndimensions = (\"sex\", \"health_in_general\")\n\ntable = api.query_table(population_type, area_type, dimensions, use_id=False)\ntable\n\n\n\n\n\n\n\n\nrgn\nsex\nhealth_in_general\ncount\npopulation_type\n\n\n\n\n0\nNorth East\nFemale\nDoes not apply\n0\nUR\n\n\n1\nNorth East\nFemale\nVery good health\n589597\nUR\n\n\n2\nNorth East\nFemale\nGood health\n454204\nUR\n\n\n3\nNorth East\nFemale\nFair health\n209830\nUR\n\n\n4\nNorth East\nFemale\nBad health\n77783\nUR\n\n\n...\n...\n...\n...\n...\n...\n\n\n115\nWales\nMale\nVery good health\n722822\nUR\n\n\n116\nWales\nMale\nGood health\n490429\nUR\n\n\n117\nWales\nMale\nFair health\n210031\nUR\n\n\n118\nWales\nMale\nBad health\n73638\nUR\n\n\n119\nWales\nMale\nVery bad health\n24084\nUR\n\n\n\n\n120 rows × 5 columns"
+  },
+  {
+    "objectID": "docs/tutorials/getting-started.html#visualising-your-results",
+    "href": "docs/tutorials/getting-started.html#visualising-your-results",
+    "title": "Getting started",
+    "section": "Visualising your results",
+    "text": "Visualising your results\nYou now have your table as a pandas.DataFrame object - you are free to store or analyse it as you see fit. Excellent!\nAs an example, let’s make a faceted bar plot with our results.\n\nimport seaborn.objects as so\nfrom seaborn import axes_style\n\n\ntable[\"prop\"] = table[\"count\"] / table.groupby(\"rgn\")[\"count\"].transform(\"sum\")\ntable = table[table[\"health_in_general\"] != \"Does not apply\"]\n\n(\n    so.Plot(table, y=\"health_in_general\", x=\"prop\", color=\"sex\")\n    .facet(\"rgn\", wrap=2)\n    .add(so.Bar(), so.Dodge())\n    .label(x=\"Proportion of population\", y=\"\", color=str.title)\n    .theme(axes_style(\"ticks\"))\n    .layout(size=(7, 8), engine=\"tight\")\n)"
+  },
+  {
+    "objectID": "docs/reference/CensusAPI.html",
+    "href": "docs/reference/CensusAPI.html",
+    "title": "CensusAPI",
+    "section": "",
+    "text": "CensusAPI(self, logger=False)\nA wrapper for the 2021 England and Wales Census API.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nlogger\nbool\nWhether to be verbose about issues when connecting to the API.\nFalse\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n_current_data\ndict or None\nData dictionary from the most recent API call. If no call has been made or the last call failed, this is None.\n\n\n_current_url\nstr or None\nURL of the most recent API call. If no call has been made, this is None."
+  },
+  {
+    "objectID": "docs/reference/CensusAPI.html#parameters",
+    "href": "docs/reference/CensusAPI.html#parameters",
+    "title": "CensusAPI",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nlogger\nbool\nWhether to be verbose about issues when connecting to the API.\nFalse"
+  },
+  {
+    "objectID": "docs/reference/CensusAPI.html#attributes",
+    "href": "docs/reference/CensusAPI.html#attributes",
+    "title": "CensusAPI",
+    "section": "",
+    "text": "Name\nType\nDescription\n\n\n\n\n_current_data\ndict or None\nData dictionary from the most recent API call. If no call has been made or the last call failed, this is None.\n\n\n_current_url\nstr or None\nURL of the most recent API call. If no call has been made, this is None."
+  }
+]
