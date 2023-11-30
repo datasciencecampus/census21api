@@ -1,0 +1,16 @@
+---
+title: Tutorials
+listing:
+    type: table
+    contents:
+        - installation.qmd
+        - getting-started.ipynb
+        - "*.ipynb"
+    fields: [title, description]
+    sort: false
+---
+
+In these tutorials, we walk through how to install the package and perform some
+basic workflows to interact with Census data.
+
+<br>
