@@ -1,0 +1,40 @@
+---
+title: Installing the package
+description: >
+    Instructions for the various ways you can install the `census21api` package
+---
+
+Currently, the `census21api` package is only installable through GitHub. We
+also require Python 3.8 or higher.
+
+## Installing from GitHub via `pip`
+
+To install from GitHub via `pip`, use the following command:
+
+```bash
+$ python -m pip install census21api@git+https://github.com/datasciencecampus/census21api
+```
+
+## Installing from source
+
+If you would prefer to install directly from source, use the following
+commands:
+
+```bash
+$ git clone https://github.com/datasciencecampus/census21api.git
+$ cd census21api
+$ python -m pip install .
+```
+
+## Installing to contribute
+
+If you intend on doing any sort of development on `census21api` - like writing documentation or implementing a new feature - it is highly recommended to
+install from source _as editable_ and _with the development dependencies_.
+
+To do so, make a fork of the repository and then run the following:
+
+```bash
+$ git clone https://github.com/<your-username>/census21api.git
+$ cd census21api
+$ python -m pip install -e ".[dev]"
+```

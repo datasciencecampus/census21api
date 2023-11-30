@@ -2,21 +2,23 @@ project:
   type: website
 
 website:
-  title: "Census 2021 API"
+  title: "`census21api`"
   navbar:
     left:
+      - href: docs/tutorials/index.qmd
+        text: Tutorials
       - href: docs/reference/index.qmd
         text: Reference
     right:
       - icon: github
         href: https://github.com/datasciencecampus/census21api
 
-page-footer:
-  left: >
-    All content is available under the
-    [Open Government Licence V3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/),
-    except where otherwise stated.
-    Built using [Quarto](https://quarto.org/).
+  page-footer:
+    left: >
+      All content is available under the
+      [Open Government Licence V3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/),
+      except where otherwise stated.<br>
+      Built using [Quarto](https://quarto.org/).
 
 format:
   html:
