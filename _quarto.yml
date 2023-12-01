@@ -4,15 +4,23 @@ project:
 website:
   title: "`census21api`"
   navbar:
+    border: false
+    background: light
+    foreground: dark
     left:
+      - href: index.qmd
+        text: About
       - href: docs/tutorials/index.qmd
         text: Tutorials
       - href: docs/reference/index.qmd
         text: Reference
     right:
       - icon: github
-        href: https://github.com/datasciencecampus/census21api
-
+        menu:
+          - text: Source code
+            url: https://github.com/datasciencecampus/census21api
+          - text: Open an issue
+            url: https://github.com/datasciencecampus/census21api/issues
   page-footer:
     left: >
       All content is available under the
@@ -22,9 +30,9 @@ website:
 
 format:
   html:
-    theme:
-      light: flatly
-      dark: darkly
+    mainfont: Arial
+    theme: flatly
+    lang: en-GB
 
 quartodoc:
   title: API reference
