@@ -39,6 +39,11 @@ $ cd census21api
 $ python -m pip install .
 ```
 
+### Documentation
+
+We have a fully equipped documentation site on the package at:
+[datasciencecampus.github.io/census21api](https://datasciencecampus.github.io/census21api)
+
 ### Usage
 
 Here's a basic example of how to use the `CensusAPI` class to retrieve a table:
