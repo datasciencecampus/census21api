@@ -70,18 +70,11 @@
     "text": "First release. See README for details on installation and use."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome to the census21api documentation!",
-    "section": "",
-    "text": "This package, census21api, is the (unofficial) Python interface to the “Create a Custom Dataset” web tool for the 2021 England and Wales Census.\nThe primary goal of this project is to streamline the process of accessing and working with data from the 2021 England and Wales Census API. With census21api, you can create pretty much any Census tables you like in a programmatic way."
-  },
-  {
     "objectID": "index.html#what-is-this-and-why-does-it-exist",
     "href": "index.html#what-is-this-and-why-does-it-exist",
     "title": "Welcome to the census21api documentation!",
-    "section": "",
-    "text": "This package, census21api, is the (unofficial) Python interface to the “Create a Custom Dataset” web tool for the 2021 England and Wales Census.\nThe primary goal of this project is to streamline the process of accessing and working with data from the 2021 England and Wales Census API. With census21api, you can create pretty much any Census tables you like in a programmatic way."
+    "section": "What is this and why does it exist?",
+    "text": "What is this and why does it exist?\nThis package, census21api, is the (unofficial) Python interface to the “Create a Custom Dataset” web tool for the 2021 England and Wales Census.\nThe primary goal of this project is to streamline the process of accessing and working with data from the 2021 England and Wales Census API. With census21api, you can create pretty much any Census tables you like in a programmatic way."
   },
   {
     "objectID": "index.html#who-made-this",
@@ -102,14 +95,14 @@
     "href": "docs/tutorials/index.html",
     "title": "Tutorials",
     "section": "",
-    "text": "In these tutorials, we walk through how to install the package and perform some basic workflows to interact with Census data.\n\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nTitle\n\n\nDescription\n\n\n\n\n\n\nInstalling the package\n\n\nInstructions for the various ways you can install the census21api package \n\n\n\n\nGetting started\n\n\nA typical workflow with the package, creating a single table\n\n\n\n\n\n\nNo matching items"
+    "text": "In these tutorials, we walk through how to install the package and perform some basic workflows to interact with Census data.\n\n\n\n\n\n\n\n   \n     \n     \n       Order By\n       Default\n         \n          Title\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\nTitle\n\n\nDescription\n\n\n\n\n\n\nInstalling the package\n\n\nInstructions for the various ways you can install the census21api package \n\n\n\n\nGetting started\n\n\nA typical workflow of retrieving some metadata and a table from the API \n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "docs/tutorials/getting-started.html",
     "href": "docs/tutorials/getting-started.html",
     "title": "Getting started",
     "section": "",
-    "text": "In this tutorial, we go over the typical sort of interaction a user will have with the package: retrieving a table from the API."
+    "text": "In this tutorial, we go over the sort of interaction a user will usually have with the package: querying the API for some metadata and a getting a table."
   },
   {
     "objectID": "docs/tutorials/getting-started.html#making-a-connection",
@@ -123,21 +116,21 @@
     "href": "docs/tutorials/getting-started.html#defining-a-query",
     "title": "Getting started",
     "section": "Defining a query",
-    "text": "Defining a query\nNow, to query a table, we need three parameters:\n\na population type (e.g. household reference persons, usual residents)\nan area type (e.g. local authorities, Senedd electoral regions)\nsome dimensions (e.g. english proficiency, economic activity)\n\nLet’s say we are interested in the relationship between binary sex and health across the regions of England and Wales. Then our parameters are:\n\npopulation type: usual residents in the UK\narea type: region\ndimensions: sex and health in general"
+    "text": "Defining a query\nNow, to query a table, we need three parameters:\n\na population type (e.g. household reference persons, usual residents)\nan area type (e.g. local authorities, Senedd electoral regions)\nsome dimensions (e.g. english proficiency, economic activity)\n\nLet’s say we want the counts for different levels of deprivation between the sexes at a national level. Deprivation statistics are recorded at the household level.\nSo, our parameters are:\n\npopulation type: usual residents in households\narea type: national\ndimensions: sex and deprivation"
+  },
+  {
+    "objectID": "docs/tutorials/getting-started.html#finding-column-names",
+    "href": "docs/tutorials/getting-started.html#finding-column-names",
+    "title": "Getting started",
+    "section": "Finding column names",
+    "text": "Finding column names\nThere are a few columns relating to deprivation in the API.\nWe could go through the dictionary census21api.constants.DIMENSIONS_BY_POPULATION_TYPE to look for the relevant ones, but they might not be all that descriptive.\nInstead, we can retrieve the information from the API:\n\npopulation_type = \"UR_HH\"\n\nmetadata = api.query_feature(population_type, \"dimensions\")\nmetadata[metadata[\"id\"].str.contains(\"deprivation\")]\n\n\n\n\n\n\n\n\nid\nlabel\ndescription\ntotal_count\nquality_statement_text\npopulation_type\n\n\n\n\n21\nhh_deprivation\nHousehold deprivation (6 categories)\nThe dimensions of deprivation used to classify...\n6\nCaution should be used in interpreting this va...\nUR_HH\n\n\n22\nhh_deprivation_education\nHousehold deprived in the education dimension ...\nA household is classified as deprived in the e...\n3\n\nUR_HH\n\n\n23\nhh_deprivation_employment\nHousehold deprived in the employment dimension...\nA household is classified as deprived in the e...\n3\n\nUR_HH\n\n\n24\nhh_deprivation_health\nHousehold deprived in the health and disabilit...\nA household is classified as deprived in the h...\n3\n\nUR_HH\n\n\n25\nhh_deprivation_housing\nHousehold deprived in the housing dimension (3...\nA household is classified as deprived in the h...\n3\n\nUR_HH\n\n\n\n\n\n\n\nAfter inspecting this data frame, it looks like hh_deprivation suits our purposes - it’s an aggregate count of all the deprivation indicators."
   },
   {
     "objectID": "docs/tutorials/getting-started.html#retrieving-a-table",
     "href": "docs/tutorials/getting-started.html#retrieving-a-table",
     "title": "Getting started",
     "section": "Retrieving a table",
-    "text": "Retrieving a table\nWith that information, we can use our CensusAPI instance to retrieve the corresponding table from the API using its query_table() method:\n\npopulation_type = \"UR\"\narea_type = \"rgn\"\ndimensions = (\"sex\", \"health_in_general\")\n\ntable = api.query_table(population_type, area_type, dimensions, use_id=False)\ntable\n\n\n\n\n\n\n\n\nrgn\nsex\nhealth_in_general\ncount\npopulation_type\n\n\n\n\n0\nNorth East\nFemale\nDoes not apply\n0\nUR\n\n\n1\nNorth East\nFemale\nVery good health\n589597\nUR\n\n\n2\nNorth East\nFemale\nGood health\n454204\nUR\n\n\n3\nNorth East\nFemale\nFair health\n209830\nUR\n\n\n4\nNorth East\nFemale\nBad health\n77783\nUR\n\n\n...\n...\n...\n...\n...\n...\n\n\n115\nWales\nMale\nVery good health\n722822\nUR\n\n\n116\nWales\nMale\nGood health\n490429\nUR\n\n\n117\nWales\nMale\nFair health\n210031\nUR\n\n\n118\nWales\nMale\nBad health\n73638\nUR\n\n\n119\nWales\nMale\nVery bad health\n24084\nUR\n\n\n\n\n120 rows × 5 columns"
-  },
-  {
-    "objectID": "docs/tutorials/getting-started.html#visualising-your-results",
-    "href": "docs/tutorials/getting-started.html#visualising-your-results",
-    "title": "Getting started",
-    "section": "Visualising your results",
-    "text": "Visualising your results\nYou now have your table as a pandas.DataFrame object - you are free to store or analyse it as you see fit. Excellent!\nAs an example, let’s make a faceted bar plot with our results.\n\nimport seaborn.objects as so\nfrom seaborn import axes_style\n\n\ntable[\"prop\"] = table[\"count\"] / table.groupby(\"rgn\")[\"count\"].transform(\"sum\")\ntable = table[table[\"health_in_general\"] != \"Does not apply\"]\n\n(\n    so.Plot(table, y=\"health_in_general\", x=\"prop\", color=\"sex\")\n    .facet(\"rgn\", wrap=2)\n    .add(so.Bar(), so.Dodge())\n    .label(x=\"Proportion of population\", y=\"\", color=str.title)\n    .theme(axes_style(\"ticks\"))\n    .layout(size=(7, 8), engine=\"tight\")\n)"
+    "text": "Retrieving a table\nWith that information, we can use our CensusAPI instance to retrieve the corresponding table from the API using its query_table() method:\n\narea_type = \"nat\"\ndimensions = (\"sex\", \"hh_deprivation\")\n\ntable = api.query_table(population_type, area_type, dimensions, use_id=False)\ntable\n\n\n\n\n\n\n\n\nnat\nsex\nhh_deprivation\ncount\npopulation_type\n\n\n\n\n0\nEngland and Wales\nFemale\nDoes not apply\n0\nUR_HH\n\n\n1\nEngland and Wales\nFemale\nHousehold is not deprived in any dimension\n14536007\nUR_HH\n\n\n2\nEngland and Wales\nFemale\nHousehold is deprived in one dimension\n9928414\nUR_HH\n\n\n3\nEngland and Wales\nFemale\nHousehold is deprived in two dimensions\n4269937\nUR_HH\n\n\n4\nEngland and Wales\nFemale\nHousehold is deprived in three dimensions\n1087182\nUR_HH\n\n\n5\nEngland and Wales\nFemale\nHousehold is deprived in four dimensions\n70177\nUR_HH\n\n\n6\nEngland and Wales\nMale\nDoes not apply\n0\nUR_HH\n\n\n7\nEngland and Wales\nMale\nHousehold is not deprived in any dimension\n14375435\nUR_HH\n\n\n8\nEngland and Wales\nMale\nHousehold is deprived in one dimension\n9265887\nUR_HH\n\n\n9\nEngland and Wales\nMale\nHousehold is deprived in two dimensions\n3854022\nUR_HH\n\n\n10\nEngland and Wales\nMale\nHousehold is deprived in three dimensions\n1089564\nUR_HH\n\n\n11\nEngland and Wales\nMale\nHousehold is deprived in four dimensions\n79227\nUR_HH\n\n\n\n\n\n\n\nAnd we’re done - we have retrieved our table and we can go on to analyse it in whichever way we see fit."
   },
   {
     "objectID": "docs/reference/CensusAPI.html",

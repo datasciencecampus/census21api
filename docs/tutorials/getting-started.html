@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A typical workflow with the package, creating a single table">
+<meta name="description" content="A typical workflow of retrieving some metadata and a table from the API">
 
 <title>census21api - Getting started</title>
 <style>
@@ -70,12 +70,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -103,7 +101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -121,6 +119,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../../docs/tutorials/index.html" rel="" target="">
  <span class="menu-text">Tutorials</span></a>
   </li>  
@@ -130,14 +132,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/datasciencecampus/census21api" rel="" target=""><i class="bi bi-github" role="img">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-bi-github" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+      <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+ <span class="menu-text"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-bi-github">    
+        <li>
+    <a class="dropdown-item" href="https://github.com/datasciencecampus/census21api" rel="" target="">
+ <span class="dropdown-text">Source code</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="https://github.com/datasciencecampus/census21api/issues" rel="" target="">
+ <span class="dropdown-text">Open an issue</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <div class="quarto-navbar-tools">
-  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
@@ -147,7 +160,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#making-a-connection" id="toc-making-a-connection" class="nav-link active" data-scroll-target="#making-a-connection">Making a connection</a></li>
+  <li><a href="#defining-a-query" id="toc-defining-a-query" class="nav-link" data-scroll-target="#defining-a-query">Defining a query</a></li>
+  <li><a href="#finding-column-names" id="toc-finding-column-names" class="nav-link" data-scroll-target="#finding-column-names">Finding column names</a></li>
+  <li><a href="#retrieving-a-table" id="toc-retrieving-a-table" class="nav-link" data-scroll-target="#retrieving-a-table">Retrieving a table</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -158,7 +182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div>
   <div class="description">
-    A typical workflow with the package, creating a single table
+    <p>A typical workflow of retrieving some metadata and a table from the API</p>
   </div>
 </div>
 
@@ -173,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>In this tutorial, we go over the typical sort of interaction a user will have with the package: retrieving a table from the API.</p>
+<p>In this tutorial, we go over the sort of interaction a user will usually have with the package: querying the API for some metadata and a getting a table.</p>
 <section id="making-a-connection" class="level2">
 <h2 class="anchored" data-anchor-id="making-a-connection">Making a connection</h2>
 <p>We begin by importing the <code>CensusAPI</code> class from the package and creating an instance of it. This class is how we connect to the custom table creator API.</p>
@@ -187,28 +211,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="defining-a-query">Defining a query</h2>
 <p>Now, to query a table, we need three parameters:</p>
 <ul>
-<li>a population type (e.g.&nbsp;household reference persons, usual residents)</li>
-<li>an area type (e.g.&nbsp;local authorities, Senedd electoral regions)</li>
-<li>some dimensions (e.g.&nbsp;english proficiency, economic activity)</li>
+<li>a <strong>population type</strong> (e.g.&nbsp;household reference persons, usual residents)</li>
+<li>an <strong>area type</strong> (e.g.&nbsp;local authorities, Senedd electoral regions)</li>
+<li>some <strong>dimensions</strong> (e.g.&nbsp;english proficiency, economic activity)</li>
 </ul>
-<p>Let’s say we are interested in the relationship between binary sex and health across the regions of England and Wales. Then our parameters are:</p>
+<p>Let’s say we want the counts for different levels of deprivation between the sexes at a national level. Deprivation statistics are recorded at the household level.</p>
+<p>So, our parameters are:</p>
 <ul>
-<li>population type: usual residents in the UK</li>
-<li>area type: region</li>
-<li>dimensions: sex and health in general</li>
+<li>population type: usual residents in households</li>
+<li>area type: national</li>
+<li>dimensions: sex and deprivation</li>
 </ul>
 </section>
-<section id="retrieving-a-table" class="level2">
-<h2 class="anchored" data-anchor-id="retrieving-a-table">Retrieving a table</h2>
-<p>With that information, we can use our <code>CensusAPI</code> instance to retrieve the corresponding table from the API using its <code>query_table()</code> method:</p>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>population_type <span class="op">=</span> <span class="st">"UR"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>area_type <span class="op">=</span> <span class="st">"rgn"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dimensions <span class="op">=</span> (<span class="st">"sex"</span>, <span class="st">"health_in_general"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> api.query_table(population_type, area_type, dimensions, use_id<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<section id="finding-column-names" class="level2">
+<h2 class="anchored" data-anchor-id="finding-column-names">Finding column names</h2>
+<p>There are a few columns relating to deprivation in the API.</p>
+<p>We could go through the dictionary <code>census21api.constants.DIMENSIONS_BY_POPULATION_TYPE</code> to look for the relevant ones, but they might not be all that descriptive.</p>
+<p>Instead, we can retrieve the information from the API:</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>population_type <span class="op">=</span> <span class="st">"UR_HH"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>metadata <span class="op">=</span> api.query_feature(population_type, <span class="st">"dimensions"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>metadata[metadata[<span class="st">"id"</span>].<span class="bu">str</span>.contains(<span class="st">"deprivation"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div>
 
 
@@ -216,9 +241,88 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">rgn</th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">label</th>
+<th data-quarto-table-cell-role="th">description</th>
+<th data-quarto-table-cell-role="th">total_count</th>
+<th data-quarto-table-cell-role="th">quality_statement_text</th>
+<th data-quarto-table-cell-role="th">population_type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">21</td>
+<td>hh_deprivation</td>
+<td>Household deprivation (6 categories)</td>
+<td>The dimensions of deprivation used to classify...</td>
+<td>6</td>
+<td>Caution should be used in interpreting this va...</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">22</td>
+<td>hh_deprivation_education</td>
+<td>Household deprived in the education dimension ...</td>
+<td>A household is classified as deprived in the e...</td>
+<td>3</td>
+<td></td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">23</td>
+<td>hh_deprivation_employment</td>
+<td>Household deprived in the employment dimension...</td>
+<td>A household is classified as deprived in the e...</td>
+<td>3</td>
+<td></td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">24</td>
+<td>hh_deprivation_health</td>
+<td>Household deprived in the health and disabilit...</td>
+<td>A household is classified as deprived in the h...</td>
+<td>3</td>
+<td></td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25</td>
+<td>hh_deprivation_housing</td>
+<td>Household deprived in the housing dimension (3...</td>
+<td>A household is classified as deprived in the h...</td>
+<td>3</td>
+<td></td>
+<td>UR_HH</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>After inspecting this data frame, it looks like <code>hh_deprivation</code> suits our purposes - it’s an aggregate count of all the deprivation indicators.</p>
+</section>
+<section id="retrieving-a-table" class="level2">
+<h2 class="anchored" data-anchor-id="retrieving-a-table">Retrieving a table</h2>
+<p>With that information, we can use our <code>CensusAPI</code> instance to retrieve the corresponding table from the API using its <code>query_table()</code> method:</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>area_type <span class="op">=</span> <span class="st">"nat"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dimensions <span class="op">=</span> (<span class="st">"sex"</span>, <span class="st">"hh_deprivation"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> api.query_table(population_type, area_type, dimensions, use_id<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">nat</th>
 <th data-quarto-table-cell-role="th">sex</th>
-<th data-quarto-table-cell-role="th">health_in_general</th>
+<th data-quarto-table-cell-role="th">hh_deprivation</th>
 <th data-quarto-table-cell-role="th">count</th>
 <th data-quarto-table-cell-role="th">population_type</th>
 </tr>
@@ -226,124 +330,107 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>North East</td>
+<td>England and Wales</td>
 <td>Female</td>
 <td>Does not apply</td>
 <td>0</td>
-<td>UR</td>
+<td>UR_HH</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>North East</td>
+<td>England and Wales</td>
 <td>Female</td>
-<td>Very good health</td>
-<td>589597</td>
-<td>UR</td>
+<td>Household is not deprived in any dimension</td>
+<td>14536007</td>
+<td>UR_HH</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>North East</td>
+<td>England and Wales</td>
 <td>Female</td>
-<td>Good health</td>
-<td>454204</td>
-<td>UR</td>
+<td>Household is deprived in one dimension</td>
+<td>9928414</td>
+<td>UR_HH</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>North East</td>
+<td>England and Wales</td>
 <td>Female</td>
-<td>Fair health</td>
-<td>209830</td>
-<td>UR</td>
+<td>Household is deprived in two dimensions</td>
+<td>4269937</td>
+<td>UR_HH</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>North East</td>
+<td>England and Wales</td>
 <td>Female</td>
-<td>Bad health</td>
-<td>77783</td>
-<td>UR</td>
+<td>Household is deprived in three dimensions</td>
+<td>1087182</td>
+<td>UR_HH</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
+<td data-quarto-table-cell-role="th">5</td>
+<td>England and Wales</td>
+<td>Female</td>
+<td>Household is deprived in four dimensions</td>
+<td>70177</td>
+<td>UR_HH</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">115</td>
-<td>Wales</td>
+<td data-quarto-table-cell-role="th">6</td>
+<td>England and Wales</td>
 <td>Male</td>
-<td>Very good health</td>
-<td>722822</td>
-<td>UR</td>
+<td>Does not apply</td>
+<td>0</td>
+<td>UR_HH</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">116</td>
-<td>Wales</td>
+<td data-quarto-table-cell-role="th">7</td>
+<td>England and Wales</td>
 <td>Male</td>
-<td>Good health</td>
-<td>490429</td>
-<td>UR</td>
+<td>Household is not deprived in any dimension</td>
+<td>14375435</td>
+<td>UR_HH</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">117</td>
-<td>Wales</td>
+<td data-quarto-table-cell-role="th">8</td>
+<td>England and Wales</td>
 <td>Male</td>
-<td>Fair health</td>
-<td>210031</td>
-<td>UR</td>
+<td>Household is deprived in one dimension</td>
+<td>9265887</td>
+<td>UR_HH</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">118</td>
-<td>Wales</td>
+<td data-quarto-table-cell-role="th">9</td>
+<td>England and Wales</td>
 <td>Male</td>
-<td>Bad health</td>
-<td>73638</td>
-<td>UR</td>
+<td>Household is deprived in two dimensions</td>
+<td>3854022</td>
+<td>UR_HH</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">119</td>
-<td>Wales</td>
+<td data-quarto-table-cell-role="th">10</td>
+<td>England and Wales</td>
 <td>Male</td>
-<td>Very bad health</td>
-<td>24084</td>
-<td>UR</td>
+<td>Household is deprived in three dimensions</td>
+<td>1089564</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>England and Wales</td>
+<td>Male</td>
+<td>Household is deprived in four dimensions</td>
+<td>79227</td>
+<td>UR_HH</td>
 </tr>
 </tbody>
 </table>
 
-<p>120 rows × 5 columns</p>
 </div>
 </div>
 </div>
-</section>
-<section id="visualising-your-results" class="level2">
-<h2 class="anchored" data-anchor-id="visualising-your-results">Visualising your results</h2>
-<p>You now have your table as a <code>pandas.DataFrame</code> object - you are free to store or analyse it as you see fit. Excellent!</p>
-<p>As an example, let’s make a faceted bar plot with our results.</p>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn.objects <span class="im">as</span> so</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> seaborn <span class="im">import</span> axes_style</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>table[<span class="st">"prop"</span>] <span class="op">=</span> table[<span class="st">"count"</span>] <span class="op">/</span> table.groupby(<span class="st">"rgn"</span>)[<span class="st">"count"</span>].transform(<span class="st">"sum"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> table[table[<span class="st">"health_in_general"</span>] <span class="op">!=</span> <span class="st">"Does not apply"</span>]</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    so.Plot(table, y<span class="op">=</span><span class="st">"health_in_general"</span>, x<span class="op">=</span><span class="st">"prop"</span>, color<span class="op">=</span><span class="st">"sex"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    .facet(<span class="st">"rgn"</span>, wrap<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    .add(so.Bar(), so.Dodge())</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    .label(x<span class="op">=</span><span class="st">"Proportion of population"</span>, y<span class="op">=</span><span class="st">""</span>, color<span class="op">=</span><span class="bu">str</span>.title)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    .theme(axes_style(<span class="st">"ticks"</span>))</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    .layout(size<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">8</span>), engine<span class="op">=</span><span class="st">"tight"</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<p><img src="getting-started_files/figure-html/cell-5-output-1.png" width="770" height="753"></p>
-</div>
-</div>
+<p>And we’re done - we have retrieved our table and we can go on to analyse it in whichever way we see fit.</p>
 
 
 </section>
@@ -369,121 +456,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
-  const disableStylesheet = (stylesheets) => {
-    for (let i=0; i < stylesheets.length; i++) {
-      const stylesheet = stylesheets[i];
-      stylesheet.rel = 'prefetch';
-    }
-  }
-  const enableStylesheet = (stylesheets) => {
-    for (let i=0; i < stylesheets.length; i++) {
-      const stylesheet = stylesheets[i];
-      stylesheet.rel = 'stylesheet';
-    }
-  }
-  const manageTransitions = (selector, allowTransitions) => {
-    const els = window.document.querySelectorAll(selector);
-    for (let i=0; i < els.length; i++) {
-      const el = els[i];
-      if (allowTransitions) {
-        el.classList.remove('notransition');
-      } else {
-        el.classList.add('notransition');
-      }
-    }
-  }
-  const toggleColorMode = (alternate) => {
-    // Switch the stylesheets
-    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
-    manageTransitions('#quarto-margin-sidebar .nav-link', false);
-    if (alternate) {
-      enableStylesheet(alternateStylesheets);
-      for (const sheetNode of alternateStylesheets) {
-        if (sheetNode.id === "quarto-bootstrap") {
-          toggleBodyColorMode(sheetNode);
-        }
-      }
-    } else {
-      disableStylesheet(alternateStylesheets);
-      toggleBodyColorPrimary();
-    }
-    manageTransitions('#quarto-margin-sidebar .nav-link', true);
-    // Switch the toggles
-    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
-    for (let i=0; i < toggles.length; i++) {
-      const toggle = toggles[i];
-      if (toggle) {
-        if (alternate) {
-          toggle.classList.add("alternate");     
-        } else {
-          toggle.classList.remove("alternate");
-        }
-      }
-    }
-    // Hack to workaround the fact that safari doesn't
-    // properly recolor the scrollbar when toggling (#1455)
-    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
-      manageTransitions("body", false);
-      window.scrollTo(0, 1);
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        manageTransitions("body", true);
-      }, 40);  
-    }
-  }
-  const isFileUrl = () => { 
-    return window.location.protocol === 'file:';
-  }
-  const hasAlternateSentinel = () => {  
-    let styleSentinel = getColorSchemeSentinel();
-    if (styleSentinel !== null) {
-      return styleSentinel === "alternate";
-    } else {
-      return false;
-    }
-  }
-  const setStyleSentinel = (alternate) => {
-    const value = alternate ? "alternate" : "default";
-    if (!isFileUrl()) {
-      window.localStorage.setItem("quarto-color-scheme", value);
-    } else {
-      localAlternateSentinel = value;
-    }
-  }
-  const getColorSchemeSentinel = () => {
-    if (!isFileUrl()) {
-      const storageValue = window.localStorage.getItem("quarto-color-scheme");
-      return storageValue != null ? storageValue : localAlternateSentinel;
-    } else {
-      return localAlternateSentinel;
-    }
-  }
-  let localAlternateSentinel = 'default';
-  // Dark / light mode switch
-  window.quartoToggleColorScheme = () => {
-    // Read the current dark / light value 
-    let toAlternate = !hasAlternateSentinel();
-    toggleColorMode(toAlternate);
-    setStyleSentinel(toAlternate);
-  };
-  // Ensure there is a toggle, if there isn't float one in the top right
-  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
-    const a = window.document.createElement('a');
-    a.classList.add('top-right');
-    a.classList.add('quarto-color-scheme-toggle');
-    a.href = "";
-    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
-    const i = window.document.createElement("i");
-    i.classList.add('bi');
-    a.appendChild(i);
-    window.document.body.appendChild(a);
-  }
-  // Switch to dark mode if need be
-  if (hasAlternateSentinel()) {
-    toggleColorMode(true);
-  } else {
-    toggleColorMode(false);
-  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
