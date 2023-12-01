@@ -1,4 +1,4 @@
-# `census21api`: a Python interface for the ONS "Create a Custom Dataset" API
+# `census21api`: a Python interface to the 2021 England and Wales Census
 
 This repository contains the unofficial Python interface to the
 ["Create a Custom Dataset"](https://www.ons.gov.uk/datasets/create) tool for
