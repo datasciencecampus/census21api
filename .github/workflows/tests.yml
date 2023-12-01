@@ -32,7 +32,14 @@ jobs:
           python -m pip install ".[test]"
       - name: Run tests
         run: |
-          python -m pytest --cov=census21api --cov-fail-under=100 tests
+          python -m pytest tests --cov=census21api --cov-fail-under=100
+      - name: Test documentation
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.11
+        run: |
+          python -m pip install ".[docs]"
+          python -m doctest README.md
+          python -m pytest docs \
+            --nbval --nbval-current-env --randomly-dont-reorganize
       - name: Install and run linters
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.11
         run: |
