@@ -1,22 +1,19 @@
 # `census21api`: a Python interface for the ONS "Create a Custom Dataset" API
 
-## Overview
-
-This repository contains the unofficial Python interface for the 2021 England
-and Wales Census
-["Create a Custom Dataset" tool](https://www.ons.gov.uk/datasets/create). This
-interface was developed by the 2023 cohort of ONS (Office for National
-Statistics) data engineering/architecture apprentices with support from the ONS
-Data Science Campus.
+This repository contains the unofficial Python interface to the
+["Create a Custom Dataset"](https://www.ons.gov.uk/datasets/create) tool for
+the 2021 England and Wales Census. This interface was developed by the 2023
+cohort of ONS (Office for National Statistics) Data Engineering and
+Architecture apprentices with support from the Data Science Campus.
 
 The primary goal of this project is to simplify and streamline the process of
-accessing and working with data from the 2021 England and Wales Census API.
+accessing and working with 2021 England and Wales Census data.
 
-The `census21api` package provides a core class through which users can
-interact with the Census API, enabling users to query tables and retrieve
-metadata in a programmatic way. It offers a more user-friendly and efficient
-way to work with the Census data, particularly for data engineering and
-analysis tasks.
+The `census21api` package provides a core class, `CensusAPI`, through which
+users can interact with the Create a Custom Dataset API, enabling users to
+query tables and retrieve metadata in a programmatic way. It offers a more
+user-friendly and efficient way to work with the census data, particularly for
+data engineering and analysis tasks.
 
 ## Getting Started
 
@@ -41,8 +38,8 @@ $ python -m pip install .
 
 ### Documentation
 
-We have a fully equipped documentation site on the package at:
-[datasciencecampus.github.io/census21api](https://datasciencecampus.github.io/census21api)
+We have developed a full documentation site for the package, which is available
+at: [datasciencecampus.github.io/census21api](https://datasciencecampus.github.io/census21api)
 
 ### Usage
 
