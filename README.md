@@ -46,13 +46,11 @@ Here's a basic example of how to use the `CensusAPI` class to retrieve a table:
 ```python
 >>> from census21api import CensusAPI
 >>> 
->>> # Create an instance of the APIWrapper
 >>> api = CensusAPI()
 >>> 
->>> # Specify a population type (see `census21api.constants.POPULATION_TYPES`)
+>>> # Specify a population type, area type, and some dimensions
+>>> # See `census21api.constants` for a list of options
 >>> population_type = "UR_HH"
->>> 
->>> # Specify an area type and some dimensions (see `census21api.constants`)
 >>> area_type = "ctry"
 >>> dimensions = ("sex", "hh_deprivation_housing")
 >>> 
