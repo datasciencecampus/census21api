@@ -53,7 +53,7 @@ Here's a basic example of how to use the `CensusAPI` class to retrieve a table:
 >>> population_type = "UR_HH"
 >>> 
 >>> # Specify an area type and some dimensions (see `census21api.constants`)
->>> area_type = "nat"  # National (across England and Wales)
+>>> area_type = "ctry"
 >>> dimensions = ("sex", "hh_deprivation_housing")
 >>> 
 >>> # Submit the parameters to the table querist method
