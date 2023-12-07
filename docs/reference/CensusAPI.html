@@ -211,8 +211,8 @@ ul.task-list li input[type="checkbox"] {
 <td>Query metadata on a feature for a population type.</td>
 </tr>
 <tr class="even">
-<td><a href="#census21api.wrapper.CensusAPI.query_population_type">query_population_type</a></td>
-<td>Query the metadata for a population type.</td>
+<td><a href="#census21api.wrapper.CensusAPI.query_population_types">query_population_types</a></td>
+<td>Query the metadata for a set of population types.</td>
 </tr>
 <tr class="odd">
 <td><a href="#census21api.wrapper.CensusAPI.query_table">query_table</a></td>
@@ -403,19 +403,19 @@ ul.task-list li input[type="checkbox"] {
 </table>
 </section>
 </section>
-<section id="census21api.wrapper.CensusAPI.query_population_type" class="level3">
-<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.query_population_type">query_population_type</h3>
-<p><code>wrapper.CensusAPI.query_population_type(population_type)</code></p>
-<p>Query the metadata for a population type.</p>
-<p>This method connects to the <code>population-types</code> endpoint for a population type (ie. <code>/{population_type}</code>) and returns a series format of the metadata there.</p>
+<section id="census21api.wrapper.CensusAPI.query_population_types" class="level3">
+<h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.query_population_types">query_population_types</h3>
+<p><code>wrapper.CensusAPI.query_population_types(*population_types)</code></p>
+<p>Query the metadata for a set of population types.</p>
+<p>This method finds all available population types and retrieves their metadata from the <code>population-types</code> endpoint, returning the combined information as a data frame.</p>
 <section id="parameters-4" class="level4">
 <h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 6%">
-<col style="width: 66%">
 <col style="width: 10%">
+<col style="width: 4%">
+<col style="width: 79%">
+<col style="width: 5%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -427,10 +427,10 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>population_type</code></td>
+<td><code>population_types</code></td>
 <td>str</td>
-<td>Population type to be queried. See <code>census21api.constants.POPULATION_TYPES</code>.</td>
-<td><em>required</em></td>
+<td>Population types to be queried. If not specified, metadata on all the population types are returned. See <code>census21api.constants.POPULATION_TYPES</code>.</td>
+<td><code>()</code></td>
 </tr>
 </tbody>
 </table>
@@ -439,8 +439,8 @@ ul.task-list li input[type="checkbox"] {
 <h4 class="anchored" data-anchor-id="returns-3">Returns</h4>
 <table class="table">
 <colgroup>
-<col style="width: 26%">
-<col style="width: 73%">
+<col style="width: 23%">
+<col style="width: 76%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -450,8 +450,8 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td>pandas.pandas.Series or None</td>
-<td>Series with the population type metadata if the call succeeds, and <code>None</code> if not.</td>
+<td>pandas.pandas.DataFrame or None</td>
+<td>Data frame with all the population type metadata. If none of the API calls are successful, returns <code>None</code>.</td>
 </tr>
 </tbody>
 </table>
