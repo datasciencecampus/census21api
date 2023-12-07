@@ -32,12 +32,20 @@ for National Statistics data engineering and architecture apprentices -- with
 support from the [Data Science Campus](https://datasciencecampus.ons.gov.uk).
 
 See our [citation file](https://github.com/datasciencecampus/census21api/blob/main/CITATION.cff)
-for a list of our authors.
+for a list of the original authors or our
+[GitHub repository](https://github.com/datasciencecampus/census21api/graphs/contributors) 
+for all the contributors.
 
 ## Where do I go now?
 
-Get stuck in with the package by checking out our
-[tutorials](docs/tutorials/index.qmd). For closer details, consider our
-[API reference](docs/reference/index.qmd).
+Our documentation follows the [Diátaxis](https://diataxis.fr/) framework and is
+split into the following sections:
+
+- [Tutorials](docs/tutorials/index.qmd) are walkthroughs of projects using
+  `census21api` --- if you're new, start here.
+- [How-to guides](docs/how-to-guides/index.qmd) are short guides with a very
+  specific goal in mind.
+- [Reference](docs/reference/index.qmd) holds the technical documentation
+  covering the details of how `census21api` works.
 
 :::

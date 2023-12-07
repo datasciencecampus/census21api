@@ -12,6 +12,8 @@ website:
         text: About
       - href: docs/tutorials/index.qmd
         text: Tutorials
+      - href: docs/how-to-guides/index.qmd
+        text: How-to guides
       - href: docs/reference/index.qmd
         text: Reference
     right:
