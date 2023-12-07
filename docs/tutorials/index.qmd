@@ -10,7 +10,9 @@ listing:
     sort: false
 ---
 
-In these tutorials, we walk through how to install the package and perform some
-basic workflows to interact with Census data.
+In these tutorials, we walk you through some small projects using
+`census21api`. The purpose of this section of the documentation is for you to
+learn how to use the package for your own projects. For closer details of the
+package's innards, see the [Reference](docs/reference/index.qmd) material.
 
 <br>
