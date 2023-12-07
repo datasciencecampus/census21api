@@ -2,7 +2,7 @@
 
 import warnings
 from json import JSONDecodeError
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Set
 
 import pandas as pd
 import requests
@@ -10,7 +10,8 @@ from requests.models import Response
 
 from census21api.constants import API_ROOT
 
-DataLike = Optional[Dict[str, Any]]
+JSONLike = Optional[Dict[str, Any]]
+DataLike = Optional[pd.DataFrame]
 
 
 class CensusAPI:
@@ -37,7 +38,7 @@ class CensusAPI:
         self._current_url: str = None
         self._current_data: dict = None
 
-    def _process_response(self, response: Response) -> DataLike:
+    def _process_response(self, response: Response) -> JSONLike:
         """
         Validate and extract data from a response.
 
@@ -86,7 +87,7 @@ class CensusAPI:
 
         return data
 
-    def get(self, url: str) -> DataLike:
+    def get(self, url: str) -> JSONLike:
         """
         Make a call to, and retrieve some data from, the API.
 
@@ -112,7 +113,7 @@ class CensusAPI:
 
     def _query_table_json(
         self, population_type: str, area_type: str, dimensions: List[str]
-    ) -> DataLike:
+    ) -> JSONLike:
         """
         Retrieve the JSON for a table query from the API.
 
@@ -149,7 +150,7 @@ class CensusAPI:
         area_type: str,
         dimensions: List[str],
         use_id: bool = True,
-    ) -> Optional[pd.DataFrame]:
+    ) -> DataLike:
         """
         Query a custom table from the API.
 
@@ -194,35 +195,83 @@ class CensusAPI:
 
             return data
 
-    def query_population_type(
-        self, population_type: str
-    ) -> Optional[pd.Series]:
+    def _get_population_types(self) -> Set[str]:
         """
-        Query the metadata for a population type.
+        Retrieve the set of available population types from the API.
 
-        This method connects to the `population-types` endpoint for a
-        population type (ie. `/{population_type}`) and returns a series
-        format of the metadata there.
+        Returns
+        -------
+        available_types : set of str
+            Set of codes for the available population types.
+        """
+
+        json = self.get(f"{API_ROOT}?limit=100")
+        available_types = set(
+            item["name"]
+            for item in json["items"]
+            if item["type"] == "microdata"
+        )
+
+        return available_types
+
+    def _query_population_type_json(self, population_type: str) -> JSONLike:
+        """
+        Query the metadata for a population type in JSON format.
 
         Parameters
         ----------
         population_type : str
             Population type to be queried.
-            See `census21api.constants.POPULATION_TYPES`.
 
         Returns
         -------
-        metadata : pd.Series or None
-            Series with the population type metadata if the call
-            succeeds, and `None` if not.
+        metadata : dict or None
+            Dictionary of population type metadata if the call succeeds,
+            and `None` if not.
         """
 
         url = "/".join((API_ROOT, population_type))
         json = self.get(url)
-        metadata = None
 
-        if isinstance(json, dict) and "population_type" in json:
-            metadata = pd.Series(json["population_type"])
+        if isinstance(json, dict):
+            return json.get("population_type")
+
+    def query_population_types(self, *population_types: str) -> DataLike:
+        """
+        Query the metadata for a set of population types.
+
+        This method finds all available population types and retrieves
+        their metadata from the `population-types` endpoint, returning
+        the combined information as a data frame.
+
+        Parameters
+        ----------
+        population_types : str
+            Population types to be queried. If not specified, metadata
+            on all the population types are returned. See
+            `census21api.constants.POPULATION_TYPES`.
+
+        Returns
+        -------
+        metadata : pandas.DataFrame or None
+            Data frame with all the population type metadata. If none of
+            the API calls are successful, returns `None`.
+        """
+
+        available_types = self._get_population_types()
+
+        metas = []
+        for population_type in available_types:
+            meta = self._query_population_type_json(population_type)
+            if isinstance(meta, dict) and "name" in meta:
+                metas.append(meta)
+
+        if not metas:
+            return None
+
+        metadata = pd.DataFrame(metas)
+        if population_types:
+            metadata = metadata[metadata["name"].isin(population_types)]
 
         return metadata
 
@@ -231,7 +280,7 @@ class CensusAPI:
         population_type: str,
         feature: Literal["area-types", "dimensions"],
         *items: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> DataLike:
         """
         Query metadata on a feature for a population type.
 
@@ -276,7 +325,7 @@ class CensusAPI:
         population_type: str,
         feature: Literal["area-types", "dimensions"],
         item: str,
-    ) -> Optional[pd.DataFrame]:
+    ) -> DataLike:
         """
         Query metadata on the categories of a particular feature item.
 
