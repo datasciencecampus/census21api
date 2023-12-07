@@ -422,38 +422,43 @@ def test_query_feature_invalid(query, result):
     )
 
 
-@given(st_category_queries())
-def test_query_categories_single_call(query):
-    """Test the category querist works on a single call."""
+@given(st_category_queries(feature="area-types"))
+def test_query_area_type_categories_json_single_call(params):
+    """Test the category querist works for area types."""
 
-    population_type, feature, item, endpoint, items = query
+    population_type, area_type, categories = params
 
     api = CensusAPI()
 
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
-        get.return_value = {"count": 1, "total_count": 1, "items": items}
-        categories = api.query_categories(population_type, feature, item)
+        get.return_value = {"count": 1, "total_count": 1, "items": categories}
+        areas = api._query_area_type_categories_json(
+            population_type, area_type
+        )
 
-    assert isinstance(categories, pd.DataFrame)
-    assert len(categories) == len(items)
-    assert set(categories["item"]) == set(i["item"] for i in items)
-    assert (categories["population_type"] == population_type).all()
-
-    expected_columns = ["item", "population_type"]
-    assert categories.columns.to_list() == expected_columns
+    assert isinstance(areas, list)
+    assert len(areas) == len(categories)
+    assert all(isinstance(area, dict) for area in areas)
+    assert areas == categories
 
     get.assert_called_once_with(
         "/".join(
-            (API_ROOT, population_type, feature, item, f"{endpoint}?limit=500")
+            (
+                API_ROOT,
+                population_type,
+                "area-types",
+                area_type,
+                "areas?limit=500",
+            )
         )
     )
 
 
-@given(st_category_queries())
-def test_query_categories_multiple_calls(query):
-    """Test the category querist works with multiple calls."""
+@given(st_category_queries(feature="area-types"))
+def test_query_area_type_categories_json_multiple_calls(params):
+    """Test the area type category querist works for multiple calls."""
 
-    population_type, feature, item, endpoint, items = query
+    population_type, area_type, categories = params
 
     api = CensusAPI()
 
@@ -461,15 +466,16 @@ def test_query_categories_multiple_calls(query):
         get.return_value = {
             "count": 1,
             "total_count": 2,
-            "items": items.copy(),
+            "items": categories.copy(),
         }
-        categories = api.query_categories(population_type, feature, item)
+        areas = api._query_area_type_categories_json(
+            population_type, area_type
+        )
 
-    assert isinstance(categories, pd.DataFrame)
-    assert categories.columns.to_list() == ["item", "population_type"]
-    assert len(categories) == len(items) * 2
-    assert set(categories["item"]) == set(i["item"] for i in items)
-    assert (categories["population_type"] == population_type).all()
+    assert isinstance(areas, list)
+    assert len(areas) == 2 * len(categories)
+    assert all(isinstance(area, dict) for area in areas)
+    assert areas == 2 * categories
 
     assert get.call_count == 2
     get.assert_called_with(
@@ -477,9 +483,9 @@ def test_query_categories_multiple_calls(query):
             (
                 API_ROOT,
                 population_type,
-                feature,
-                item,
-                f"{endpoint}?limit=500&offset=1",
+                "area-types",
+                area_type,
+                "areas?limit=500&offset=1",
             )
         )
     )
