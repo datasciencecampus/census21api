@@ -269,11 +269,11 @@ class CensusAPI:
         if not metas:
             return None
 
-        metadata = pd.DataFrame(metas).sort_values("name")
+        metadata = pd.DataFrame(metas)
         if population_types:
             metadata = metadata[metadata["name"].isin(population_types)]
 
-        return metadata
+        return metadata.sort_values("name", ignore_index=True)
 
     def query_feature(
         self,
