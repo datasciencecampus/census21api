@@ -310,6 +310,70 @@ def test_query_population_types_valid_all_types(params):
     ]
 
 
+@given(st.lists(st.text(), min_size=1, unique=True))
+def test_query_population_types_invalid(population_types):
+    """Test the population querist returns None on all failed calls."""
+
+    api = CensusAPI()
+
+    with mock.patch(
+        "census21api.wrapper.CensusAPI._get_population_types"
+    ) as get_pop_types, mock.patch(
+        "census21api.wrapper.CensusAPI._query_population_type_json"
+    ) as query_json:
+        get_pop_types.return_value = population_types
+        query_json.return_value = None
+
+        metadata = api.query_population_types()
+
+    assert metadata is None
+
+    get_pop_types.assert_called_once_with()
+    assert query_json.call_count == len(population_types)
+    assert [call.args for call in query_json.call_args_list] == [
+        (pop_type,) for pop_type in population_types
+    ]
+
+
+@given(st_population_types(include_interested=True))
+def test_query_population_types_valid_some_types(params):
+    """Test the population querist can filter out some types."""
+
+    population_types, json_metadata, interested = params
+
+    api = CensusAPI()
+
+    with mock.patch(
+        "census21api.wrapper.CensusAPI._get_population_types"
+    ) as get_pop_types, mock.patch(
+        "census21api.wrapper.CensusAPI._query_population_type_json"
+    ) as query_json:
+        get_pop_types.return_value = population_types
+        query_json.side_effect = json_metadata
+
+        metadata = api.query_population_types(*interested)
+
+    assert isinstance(metadata, pd.DataFrame)
+    assert len(metadata) == len(interested)
+    assert metadata.columns.to_list() == [
+        "name",
+        "label",
+        "description",
+        "type",
+    ]
+    for _, row in metadata.iterrows():
+        name = row["name"]
+        assert dict(row) == next(
+            meta for meta in json_metadata if meta["name"] == name
+        )
+
+    get_pop_types.assert_called_once_with()
+    assert query_json.call_count == len(population_types)
+    assert [call.args for call in query_json.call_args_list] == [
+        (pop_type,) for pop_type in population_types
+    ]
+
+
 @given(st_feature_queries())
 def test_query_feature(query):
     """Test the feature querist can return something valid."""

@@ -109,7 +109,7 @@ def st_category_queries(draw):
 
 
 @st.composite
-def st_population_types(draw):
+def st_population_types(draw, include_interested=False):
     """Sample a set of population types and their metadata."""
 
     population_types = draw(st.lists(st.text(), min_size=1, unique=True))
@@ -123,4 +123,11 @@ def st_population_types(draw):
         for population_type in population_types
     ]
 
-    return population_types, json_metadata
+    if not include_interested:
+        return population_types, json_metadata
+
+    interested = draw(
+        st.sets(st.sampled_from(population_types), min_size=1).map(sorted)
+    )
+
+    return population_types, json_metadata, interested
