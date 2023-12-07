@@ -492,22 +492,72 @@ def test_query_area_type_categories_json_multiple_calls(params):
 
 
 @given(
-    st_category_queries(),
+    st_category_queries(feature="area-types"),
     st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
 )
-def test_query_categories_invalid(query, result):
-    """Test the category querist returns nothing on a failed call."""
+def test_query_area_type_categories_json_single_call_invalid(params, result):
+    """Test the category querist gives None if the first call fails."""
 
-    population_type, feature, item, endpoint, _ = query
+    population_type, area_type, _ = params
 
     api = CensusAPI()
 
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
         get.return_value = result
-        categories = api.query_categories(population_type, feature, item)
+        areas = api._query_area_type_categories_json(
+            population_type, area_type
+        )
 
-    assert categories is None
+    assert areas is None
 
     get.assert_called_once_with(
-        f"{API_ROOT}/{population_type}/{feature}/{item}/{endpoint}?limit=500"
+        "/".join(
+            (
+                API_ROOT,
+                population_type,
+                "area-types",
+                area_type,
+                "areas?limit=500",
+            )
+        )
+    )
+
+
+@given(
+    st_category_queries(feature="area-types"),
+    st.one_of((st.just(None), st.dictionaries(st.integers(), st.integers()))),
+)
+def test_query_area_type_categories_json_multiple_call_invalid(
+    params, second_response
+):
+    """Test the category querist gives None if the first call fails."""
+
+    population_type, area_type, categories = params
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        first_response = {
+            "count": 1,
+            "total_count": 2,
+            "items": categories.copy(),
+        }
+        get.side_effect = [first_response, second_response]
+        areas = api._query_area_type_categories_json(
+            population_type, area_type
+        )
+
+    assert areas is None
+
+    assert get.call_count == 2
+    get.assert_called_with(
+        "/".join(
+            (
+                API_ROOT,
+                population_type,
+                "area-types",
+                area_type,
+                "areas?limit=500&offset=1",
+            )
+        )
     )
