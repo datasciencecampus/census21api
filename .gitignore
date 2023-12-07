@@ -166,3 +166,6 @@ cython_debug/
 
 /.quarto/
 /_site/
+objects.json
+
+.DS_Store

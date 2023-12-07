@@ -1,10 +1,8 @@
 """Script to check whether our constants for the API are up to date."""
 
-import requests
 
 from census21api import CensusAPI
 from census21api.constants import (
-    API_ROOT,
     AREA_TYPES_BY_POPULATION_TYPE,
     DIMENSIONS_BY_POPULATION_TYPE,
     POPULATION_TYPES,
@@ -14,13 +12,8 @@ from census21api.constants import (
 def _check_population_types():
     """Check that we have all the population types."""
 
-    url = f"{API_ROOT}?limit=100"
-    response = requests.get(url, verify=True)
-    data = response.json()
-
-    available_pop_types = set(
-        item["name"] for item in data["items"] if item["type"] == "microdata"
-    )
+    api = CensusAPI()
+    available_pop_types = api._get_population_types()
 
     assert available_pop_types == set(POPULATION_TYPES), "\n".join(
         (
