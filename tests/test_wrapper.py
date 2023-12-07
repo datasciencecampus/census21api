@@ -201,6 +201,37 @@ def test_query_table_invalid(query, result):
     builder.assert_called_once_with(*query)
 
 
+@given(
+    st.lists(
+        st.tuples(st.text(), st.sampled_from(("microdata", "tabular"))),
+        min_size=1,
+        unique=True,
+    )
+)
+def test_get_population_types(population_types):
+    """Test population metadata can be filtered correctly."""
+
+    api = CensusAPI()
+
+    with mock.patch("census21api.wrapper.CensusAPI.get") as get:
+        get.return_value = {
+            "items": [
+                {"name": name, "type": dtype}
+                for name, dtype in population_types
+            ]
+        }
+
+        available_types = api._get_population_types()
+
+    assert isinstance(available_types, set)
+    assert all(isinstance(pop_type, str) for pop_type in available_types)
+    assert available_types == {
+        name for name, dtype in population_types if dtype == "microdata"
+    }
+
+    get.assert_called_once_with(f"{API_ROOT}?limit=100")
+
+
 @given(st.sampled_from(POPULATION_TYPES))
 def test_query_population_type_valid(population_type):
     """Test the population querist returns a valid series."""
@@ -216,12 +247,9 @@ def test_query_population_type_valid(population_type):
                 "type": None,
             }
         }
-        metadata = api.query_population_type(population_type)
+        metadata = api._query_population_type_json(population_type)
 
-    assert isinstance(metadata, pd.Series)
-    assert metadata.index.to_list() == ["name", "label", "description", "type"]
-    assert metadata["name"] == population_type
-    assert metadata.to_list() == [population_type, None, None, None]
+    assert metadata == get.return_value["population_type"]
 
     get.assert_called_once_with(f"{API_ROOT}/{population_type}")
 
@@ -238,7 +266,7 @@ def test_query_population_type_invalid(population_type, result):
     with mock.patch("census21api.wrapper.CensusAPI.get") as get:
         get.return_value = result
 
-        metadata = api.query_population_type(population_type)
+        metadata = api._query_population_type_json(population_type)
 
     assert metadata is None
 
