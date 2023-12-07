@@ -318,7 +318,7 @@ class CensusAPI:
             if items:
                 metadata = metadata[metadata["id"].isin(items)]
 
-        return metadata
+        return metadata.reset_index(drop=True)
 
     def query_categories(
         self,
