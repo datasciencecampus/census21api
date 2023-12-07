@@ -106,3 +106,21 @@ def st_category_queries(draw):
     items = [{"item": st.text()} for _ in range(num_items)]
 
     return population_type, feature, item, endpoint, items
+
+
+@st.composite
+def st_population_types(draw):
+    """Sample a set of population types and their metadata."""
+
+    population_types = draw(st.lists(st.text(), min_size=1, unique=True))
+    json_metadata = [
+        {
+            "name": population_type,
+            "label": draw(st.text()),
+            "description": draw(st.text()),
+            "type": "microdata",
+        }
+        for population_type in population_types
+    ]
+
+    return population_types, json_metadata
