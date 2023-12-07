@@ -300,7 +300,9 @@ def test_query_population_types_valid_all_types(params):
         "description",
         "type",
     ]
-    for (_, row), meta in zip(metadata.iterrows(), json_metadata):
+
+    sorted_json_metadata = sorted(json_metadata, key=lambda x: x["name"])
+    for (_, row), meta in zip(metadata.iterrows(), sorted_json_metadata):
         assert dict(row) == meta
 
     get_pop_types.assert_called_once_with()
