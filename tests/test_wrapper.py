@@ -589,7 +589,7 @@ def test_query_dimension_categories_json_valid(params):
         isinstance(categorisation, dict) for categorisation in categorisations
     )
     assert categorisations == [
-        cat | {"dimension": dimension} for cat in categories
+        {**cat, "dimension": dimension} for cat in categories
     ]
 
     get.assert_called_once_with(

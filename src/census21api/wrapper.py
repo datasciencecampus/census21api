@@ -393,7 +393,7 @@ class CensusAPI:
                 item for item in json["items"] if item["id"] == dimension
             )
             categorisations = [
-                cat | {"dimension": dimension} for cat in item["categories"]
+                {**cat, "dimension": dimension} for cat in item["categories"]
             ]
 
             return categorisations
