@@ -8,6 +8,6 @@ listing:
 ---
 
 This section of the documentation comprises bite-size, task-oriented guides on
-how to do something with `census21api`.
+how to make different queries using `census21api`.
 
 <br>
