@@ -137,12 +137,8 @@ def st_category_queries(draw, feature=None):
             st.sampled_from(DIMENSIONS_BY_POPULATION_TYPE[population_type])
         )
         categories = [
-            {
-                "categories": [
-                    {"id": draw(st.text()), "label": draw(st.text())}
-                    for _ in range(num_categories)
-                ]
-            }
+            {"id": draw(st.text()), "label": draw(st.text())}
+            for _ in range(num_categories)
         ]
 
     return population_type, item, categories
