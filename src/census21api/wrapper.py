@@ -2,7 +2,7 @@
 
 import warnings
 from json import JSONDecodeError
-from typing import Any, Dict, List, Literal, Optional, Set
+from typing import Any, Dict, List, Literal, Optional, Set, Union
 
 import pandas as pd
 import requests
@@ -10,7 +10,7 @@ from requests.models import Response
 
 from census21api.constants import API_ROOT
 
-JSONLike = Optional[Dict[str, Any]]
+JSONLike = Optional[Union[List[dict], Dict[str, Any]]]
 DataLike = Optional[pd.DataFrame]
 
 
@@ -36,7 +36,7 @@ class CensusAPI:
     def __init__(self, logger: bool = False) -> None:
         self._logger: bool = logger
         self._current_url: str = None
-        self._current_data: dict = None
+        self._current_data: JSONLike = None
 
     def _process_response(self, response: Response) -> JSONLike:
         """
@@ -56,7 +56,6 @@ class CensusAPI:
             Data dictionary if the response is valid and `None` if not.
         """
 
-        data = None
         if not 200 <= response.status_code <= 299:
             if self._logger:
                 warnings.warn(
@@ -69,10 +68,10 @@ class CensusAPI:
                     ),
                     UserWarning,
                 )
-            return data
+            return None
 
         try:
-            data = response.json()
+            return response.json()
         except JSONDecodeError as e:
             if self._logger:
                 warnings.warn(
@@ -84,8 +83,6 @@ class CensusAPI:
                     ),
                     UserWarning,
                 )
-
-        return data
 
     def get(self, url: str) -> JSONLike:
         """
@@ -183,7 +180,6 @@ class CensusAPI:
         table_json = self._query_table_json(
             population_type, area_type, dimensions
         )
-        data = None
 
         if isinstance(table_json, dict) and "observations" in table_json:
             records = _extract_records_from_observations(
@@ -266,14 +262,12 @@ class CensusAPI:
             if isinstance(meta, dict) and "name" in meta:
                 metas.append(meta)
 
-        if not metas:
-            return None
+        if metas:
+            metadata = pd.DataFrame(metas)
+            if population_types:
+                metadata = metadata[metadata["name"].isin(population_types)]
 
-        metadata = pd.DataFrame(metas)
-        if population_types:
-            metadata = metadata[metadata["name"].isin(population_types)]
-
-        return metadata.sort_values("name", ignore_index=True)
+            return metadata.sort_values("name", ignore_index=True)
 
     def query_feature(
         self,
@@ -310,7 +304,6 @@ class CensusAPI:
 
         url = "/".join((API_ROOT, population_type, f"{feature}?limit=500"))
         json = self.get(url)
-        metadata = None
 
         if isinstance(json, dict) and "items" in json:
             metadata = pd.json_normalize(json["items"])
@@ -318,7 +311,92 @@ class CensusAPI:
             if items:
                 metadata = metadata[metadata["id"].isin(items)]
 
-        return metadata.reset_index(drop=True)
+            return metadata.reset_index(drop=True)
+
+    def _query_area_type_categories_json(
+        self, population_type: str, area_type: str
+    ) -> JSONLike:
+        """
+        Query metadata for an area type's categories in JSON format.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        area_type : str
+            Area type to query.
+
+        Returns
+        -------
+        areas : dict or None
+            Dictionary with the area type categories if the calls
+            succeed, and `None` if any fail.
+        """
+
+        url = "/".join(
+            (
+                API_ROOT,
+                population_type,
+                "area-types",
+                area_type,
+                "areas?limit=500",
+            )
+        )
+        json = self.get(url)
+
+        if isinstance(json, dict) and "items" in json:
+            areas = json["items"]
+            total_counted = json["count"]
+            while total_counted < json["total_count"]:
+                json = self.get(url + f"&offset={total_counted}")
+                if not (isinstance(json, dict) and "items" in json):
+                    return None
+
+                areas.extend(json["items"])
+                total_counted += json["count"]
+
+            return areas
+
+    def _query_dimension_categories_json(
+        self, population_type: str, dimension: str
+    ) -> JSONLike:
+        """
+        Query metadata for a dimension's categories in JSON format.
+
+        Parameters
+        ----------
+        population_type : str
+            Population type to query.
+        dimension : str
+            Dimension to query.
+
+        Returns
+        -------
+        categorisations : list or None
+            List with the dimension category metadata if the call
+            succeeds, and `None` if not.
+        """
+
+        url = "/".join(
+            (
+                API_ROOT,
+                population_type,
+                "dimensions",
+                dimension,
+                "categorisations?limit=500",
+            )
+        )
+        json = self.get(url)
+
+        if isinstance(json, dict) and "items" in json:
+            item = next(
+                item for item in json["items"] if item["id"] == dimension
+            )
+            categorisations = [
+                cat | {"dimension": dimension} for cat in item["categories"]
+            ]
+
+            return categorisations
 
     def query_categories(
         self,
@@ -351,26 +429,20 @@ class CensusAPI:
             succeeds, and `None` if not.
         """
 
-        endpoint = "areas" if feature == "area-types" else "categorisations"
-        url = "/".join(
-            (API_ROOT, population_type, feature, item, f"{endpoint}?limit=500")
-        )
-        json = self.get(url)
-        categories = None
+        if feature == "area-types":
+            categories = self._query_area_type_categories_json(
+                population_type, item
+            )
+        if feature == "dimensions":
+            categories = self._query_dimension_categories_json(
+                population_type, item
+            )
 
-        if isinstance(json, dict) and "items" in json:
-            items = json["items"]
-
-            total_counted = json["count"]
-            while total_counted < json["total_count"]:
-                json = self.get(url + f"&offset={total_counted}")
-                items.extend(json["items"])
-                total_counted += json["count"]
-
-            categories = pd.json_normalize(items)
+        if isinstance(categories, (dict, list)):
+            categories = pd.json_normalize(categories)
             categories["population_type"] = population_type
 
-        return categories
+            return categories
 
 
 def _extract_records_from_observations(
