@@ -1,35 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/QA.html</loc>
-    <lastmod>2023-12-07T12:40:12.279Z</lastmod>
+    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-table.html</loc>
+    <lastmod>2023-12-13T13:34:26.409Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/reference/index.html</loc>
-    <lastmod>2023-12-07T12:40:11.399Z</lastmod>
+    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-categories.html</loc>
+    <lastmod>2023-12-13T13:34:24.677Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/index.html</loc>
+    <lastmod>2023-12-13T13:34:23.981Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/datasciencecampus/census21api/docs/tutorials/installation.html</loc>
-    <lastmod>2023-12-07T12:40:10.683Z</lastmod>
+    <lastmod>2023-12-13T13:34:23.205Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/CHANGES.html</loc>
-    <lastmod>2023-12-07T12:40:10.103Z</lastmod>
+    <loc>https://github.com/datasciencecampus/census21api/docs/reference/api/index.html</loc>
+    <lastmod>2023-12-13T13:34:22.625Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/datasciencecampus/census21api/docs/reference/index.html</loc>
+    <lastmod>2023-12-13T13:34:21.913Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/datasciencecampus/census21api/index.html</loc>
-    <lastmod>2023-12-07T12:40:09.579Z</lastmod>
+    <lastmod>2023-12-13T13:34:21.065Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/datasciencecampus/census21api/CHANGES.html</loc>
+    <lastmod>2023-12-13T13:34:21.601Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/datasciencecampus/census21api/docs/reference/api/CensusAPI.html</loc>
+    <lastmod>2023-12-13T13:34:22.389Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/datasciencecampus/census21api/docs/tutorials/index.html</loc>
-    <lastmod>2023-12-07T12:40:10.419Z</lastmod>
+    <lastmod>2023-12-13T13:34:22.937Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/datasciencecampus/census21api/docs/tutorials/getting-started.html</loc>
-    <lastmod>2023-12-07T12:40:11.151Z</lastmod>
+    <lastmod>2023-12-13T13:34:23.661Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/reference/CensusAPI.html</loc>
-    <lastmod>2023-12-07T12:40:11.859Z</lastmod>
+    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-population-types.html</loc>
+    <lastmod>2023-12-13T13:34:24.317Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-feature.html</loc>
+    <lastmod>2023-12-13T13:34:25.657Z</lastmod>
   </url>
 </urlset>

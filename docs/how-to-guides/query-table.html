@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A typical workflow of retrieving some metadata and a table from the API">
+<meta name="description" content="How to retrieve a custom table from the">
 
-<title>census21api - Getting started</title>
+<title>census21api - Querying a table</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -101,7 +101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -164,29 +164,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#making-a-connection" id="toc-making-a-connection" class="nav-link active" data-scroll-target="#making-a-connection">Making a connection</a></li>
-  <li><a href="#defining-a-query" id="toc-defining-a-query" class="nav-link" data-scroll-target="#defining-a-query">Defining a query</a></li>
-  <li><a href="#finding-column-names" id="toc-finding-column-names" class="nav-link" data-scroll-target="#finding-column-names">Finding column names</a></li>
-  <li><a href="#retrieving-a-table" id="toc-retrieving-a-table" class="nav-link" data-scroll-target="#retrieving-a-table">Retrieving a table</a></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Getting started</h1>
+<h1 class="title">Querying a table</h1>
 </div>
 
 <div>
   <div class="description">
-    <p>A typical workflow of retrieving some metadata and a table from the API</p>
+    How to retrieve a custom table from the
   </div>
 </div>
 
@@ -201,38 +190,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>In this tutorial, we go over the sort of interaction a user will usually have with the package: querying the API for some metadata and a getting a table.</p>
-<section id="making-a-connection" class="level2">
-<h2 class="anchored" data-anchor-id="making-a-connection">Making a connection</h2>
-<p>We begin by importing the <code>CensusAPI</code> class from the package and creating an instance of it. This class is how we connect to the custom table creator API.</p>
+<p>To retrieve a table from the Census API, you need three things:</p>
+<ul>
+<li>a <strong>population type</strong> (e.g.&nbsp;household reference persons, usual residents)</li>
+<li>an <strong>area type</strong> (e.g.&nbsp;local authorities, Senedd electoral regions)</li>
+<li>some <strong>dimensions</strong> (e.g.&nbsp;english proficiency, economic activity)</li>
+</ul>
+<section id="retrieving-a-table" class="level2">
+<h2 class="anchored" data-anchor-id="retrieving-a-table">Retrieving a table</h2>
+<p>With those selected, we can use the <code>CensusAPI.query_table()</code> method to get our table:</p>
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> census21api <span class="im">import</span> CensusAPI</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>api <span class="op">=</span> CensusAPI()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="defining-a-query" class="level2">
-<h2 class="anchored" data-anchor-id="defining-a-query">Defining a query</h2>
-<p>To query a table, we need to identify our population type, area type, and dimensions to form our query parameters.</p>
-<p>Let’s say we want the counts for different levels of deprivation between the sexes at a national level. Deprivation statistics are recorded at the household level.</p>
-<p>So, our parameters are:</p>
-<ul>
-<li>population type: usual residents in households</li>
-<li>area type: national</li>
-<li>dimensions: sex and deprivation</li>
-</ul>
-</section>
-<section id="finding-column-names" class="level2">
-<h2 class="anchored" data-anchor-id="finding-column-names">Finding column names</h2>
-<p>There are a few columns relating to deprivation in the API.</p>
-<p>We could go through the dictionary <code>census21api.constants.DIMENSIONS_BY_POPULATION_TYPE</code> to look for the relevant ones, but they might not be all that descriptive.</p>
-<p>Instead, we can retrieve the information from the API:</p>
-<div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>population_type <span class="op">=</span> <span class="st">"UR_HH"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>metadata <span class="op">=</span> api.query_feature(population_type, <span class="st">"dimensions"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>metadata[metadata[<span class="st">"id"</span>].<span class="bu">str</span>.contains(<span class="st">"deprivation"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>api <span class="op">=</span> CensusAPI()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>population_type <span class="op">=</span> <span class="st">"HRP"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>area_type <span class="op">=</span> <span class="st">"ctry"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dimensions <span class="op">=</span> (<span class="st">"sex"</span>, <span class="st">"hh_tenure_9a"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>api.query_table(population_type, area_type, dimensions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 
 
@@ -240,88 +217,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">id</th>
-<th data-quarto-table-cell-role="th">label</th>
-<th data-quarto-table-cell-role="th">description</th>
-<th data-quarto-table-cell-role="th">total_count</th>
-<th data-quarto-table-cell-role="th">quality_statement_text</th>
-<th data-quarto-table-cell-role="th">population_type</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">21</td>
-<td>hh_deprivation</td>
-<td>Household deprivation (6 categories)</td>
-<td>The dimensions of deprivation used to classify...</td>
-<td>6</td>
-<td>Caution should be used in interpreting this va...</td>
-<td>UR_HH</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">22</td>
-<td>hh_deprivation_education</td>
-<td>Household deprived in the education dimension ...</td>
-<td>A household is classified as deprived in the e...</td>
-<td>3</td>
-<td></td>
-<td>UR_HH</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">23</td>
-<td>hh_deprivation_employment</td>
-<td>Household deprived in the employment dimension...</td>
-<td>A household is classified as deprived in the e...</td>
-<td>3</td>
-<td></td>
-<td>UR_HH</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">24</td>
-<td>hh_deprivation_health</td>
-<td>Household deprived in the health and disabilit...</td>
-<td>A household is classified as deprived in the h...</td>
-<td>3</td>
-<td></td>
-<td>UR_HH</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">25</td>
-<td>hh_deprivation_housing</td>
-<td>Household deprived in the housing dimension (3...</td>
-<td>A household is classified as deprived in the h...</td>
-<td>3</td>
-<td></td>
-<td>UR_HH</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<p>After inspecting this data frame, it looks like <code>hh_deprivation</code> suits our purposes - it’s an aggregate count of all the deprivation indicators.</p>
-</section>
-<section id="retrieving-a-table" class="level2">
-<h2 class="anchored" data-anchor-id="retrieving-a-table">Retrieving a table</h2>
-<p>With that information, we can use our <code>CensusAPI</code> instance to retrieve the corresponding table from the API using its <code>query_table()</code> method:</p>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>area_type <span class="op">=</span> <span class="st">"nat"</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dimensions <span class="op">=</span> (<span class="st">"sex"</span>, <span class="st">"hh_deprivation"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> api.query_table(population_type, area_type, dimensions, use_id<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">nat</th>
+<th data-quarto-table-cell-role="th">ctry</th>
 <th data-quarto-table-cell-role="th">sex</th>
-<th data-quarto-table-cell-role="th">hh_deprivation</th>
+<th data-quarto-table-cell-role="th">hh_tenure_9a</th>
 <th data-quarto-table-cell-role="th">count</th>
 <th data-quarto-table-cell-role="th">population_type</th>
 </tr>
@@ -329,99 +227,291 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>England and Wales</td>
-<td>Female</td>
-<td>Does not apply</td>
+<td>E92000001</td>
+<td>1</td>
+<td>-8</td>
 <td>0</td>
-<td>UR_HH</td>
+<td>HRP</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>England and Wales</td>
-<td>Female</td>
-<td>Household is not deprived in any dimension</td>
-<td>14536007</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>0</td>
+<td>3276595</td>
+<td>HRP</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>England and Wales</td>
-<td>Female</td>
-<td>Household is deprived in one dimension</td>
-<td>9928414</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>1</td>
+<td>2178228</td>
+<td>HRP</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>England and Wales</td>
-<td>Female</td>
-<td>Household is deprived in two dimensions</td>
-<td>4269937</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>2</td>
+<td>109635</td>
+<td>HRP</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>England and Wales</td>
-<td>Female</td>
-<td>Household is deprived in three dimensions</td>
-<td>1087182</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>3</td>
+<td>1064598</td>
+<td>HRP</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>England and Wales</td>
-<td>Female</td>
-<td>Household is deprived in four dimensions</td>
-<td>70177</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>4</td>
+<td>1108579</td>
+<td>HRP</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>England and Wales</td>
-<td>Male</td>
-<td>Does not apply</td>
-<td>0</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>5</td>
+<td>1785514</td>
+<td>HRP</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>England and Wales</td>
-<td>Male</td>
-<td>Household is not deprived in any dimension</td>
-<td>14375435</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>6</td>
+<td>210267</td>
+<td>HRP</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>England and Wales</td>
-<td>Male</td>
-<td>Household is deprived in one dimension</td>
-<td>9265887</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>1</td>
+<td>7</td>
+<td>17429</td>
+<td>HRP</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>England and Wales</td>
-<td>Male</td>
-<td>Household is deprived in two dimensions</td>
-<td>3854022</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>2</td>
+<td>-8</td>
+<td>0</td>
+<td>HRP</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">10</td>
-<td>England and Wales</td>
-<td>Male</td>
-<td>Household is deprived in three dimensions</td>
-<td>1089564</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>2</td>
+<td>0</td>
+<td>4348098</td>
+<td>HRP</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">11</td>
-<td>England and Wales</td>
-<td>Male</td>
-<td>Household is deprived in four dimensions</td>
-<td>79227</td>
-<td>UR_HH</td>
+<td>E92000001</td>
+<td>2</td>
+<td>1</td>
+<td>4566144</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>E92000001</td>
+<td>2</td>
+<td>2</td>
+<td>126316</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>E92000001</td>
+<td>2</td>
+<td>3</td>
+<td>880554</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>E92000001</td>
+<td>2</td>
+<td>4</td>
+<td>951932</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>E92000001</td>
+<td>2</td>
+<td>5</td>
+<td>2488175</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>E92000001</td>
+<td>2</td>
+<td>6</td>
+<td>310933</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>E92000001</td>
+<td>2</td>
+<td>7</td>
+<td>13088</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>W92000004</td>
+<td>1</td>
+<td>-8</td>
+<td>0</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>W92000004</td>
+<td>1</td>
+<td>0</td>
+<td>219732</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>W92000004</td>
+<td>1</td>
+<td>1</td>
+<td>129053</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>W92000004</td>
+<td>1</td>
+<td>2</td>
+<td>2020</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>W92000004</td>
+<td>1</td>
+<td>3</td>
+<td>66360</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23</td>
+<td>W92000004</td>
+<td>1</td>
+<td>4</td>
+<td>56478</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">24</td>
+<td>W92000004</td>
+<td>1</td>
+<td>5</td>
+<td>87615</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25</td>
+<td>W92000004</td>
+<td>1</td>
+<td>6</td>
+<td>14552</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26</td>
+<td>W92000004</td>
+<td>1</td>
+<td>7</td>
+<td>1247</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">27</td>
+<td>W92000004</td>
+<td>2</td>
+<td>-8</td>
+<td>0</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">28</td>
+<td>W92000004</td>
+<td>2</td>
+<td>0</td>
+<td>292357</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">29</td>
+<td>W92000004</td>
+<td>2</td>
+<td>1</td>
+<td>248774</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">30</td>
+<td>W92000004</td>
+<td>2</td>
+<td>2</td>
+<td>2263</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">31</td>
+<td>W92000004</td>
+<td>2</td>
+<td>3</td>
+<td>50277</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">32</td>
+<td>W92000004</td>
+<td>2</td>
+<td>4</td>
+<td>48978</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">33</td>
+<td>W92000004</td>
+<td>2</td>
+<td>5</td>
+<td>107229</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">34</td>
+<td>W92000004</td>
+<td>2</td>
+<td>6</td>
+<td>19245</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">35</td>
+<td>W92000004</td>
+<td>2</td>
+<td>7</td>
+<td>933</td>
+<td>HRP</td>
 </tr>
 </tbody>
 </table>
@@ -429,7 +519,322 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>And we’re done - we have retrieved our table and we can go on to analyse it in whichever way we see fit.</p>
+</section>
+<section id="retrieving-labelled-data" class="level2">
+<h2 class="anchored" data-anchor-id="retrieving-labelled-data">Retrieving labelled data</h2>
+<p>Sometimes the encoded data can be a bit opaque. If you would prefer to use the labels for the area type and dimensions, use the <code>use_id</code> argument:</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>api.query_table(population_type, area_type, dimensions, use_id<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ctry</th>
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th">hh_tenure_9a</th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">population_type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>England</td>
+<td>Female</td>
+<td>Does not apply</td>
+<td>0</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>England</td>
+<td>Female</td>
+<td>Owned: Owns outright</td>
+<td>3276595</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>England</td>
+<td>Female</td>
+<td>Owned: Owns with a mortgage or loan</td>
+<td>2178228</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>England</td>
+<td>Female</td>
+<td>Shared ownership: Shared ownership</td>
+<td>109635</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>England</td>
+<td>Female</td>
+<td>Social rented: Rents from council or Local Aut...</td>
+<td>1064598</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>England</td>
+<td>Female</td>
+<td>Social rented: Other social rented</td>
+<td>1108579</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>England</td>
+<td>Female</td>
+<td>Private rented: Private landlord or letting ag...</td>
+<td>1785514</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>England</td>
+<td>Female</td>
+<td>Private rented: Other private rented</td>
+<td>210267</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>England</td>
+<td>Female</td>
+<td>Lives rent free</td>
+<td>17429</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>England</td>
+<td>Male</td>
+<td>Does not apply</td>
+<td>0</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>England</td>
+<td>Male</td>
+<td>Owned: Owns outright</td>
+<td>4348098</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>England</td>
+<td>Male</td>
+<td>Owned: Owns with a mortgage or loan</td>
+<td>4566144</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>England</td>
+<td>Male</td>
+<td>Shared ownership: Shared ownership</td>
+<td>126316</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>England</td>
+<td>Male</td>
+<td>Social rented: Rents from council or Local Aut...</td>
+<td>880554</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>England</td>
+<td>Male</td>
+<td>Social rented: Other social rented</td>
+<td>951932</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>England</td>
+<td>Male</td>
+<td>Private rented: Private landlord or letting ag...</td>
+<td>2488175</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>England</td>
+<td>Male</td>
+<td>Private rented: Other private rented</td>
+<td>310933</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>England</td>
+<td>Male</td>
+<td>Lives rent free</td>
+<td>13088</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">18</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Does not apply</td>
+<td>0</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">19</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Owned: Owns outright</td>
+<td>219732</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">20</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Owned: Owns with a mortgage or loan</td>
+<td>129053</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">21</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Shared ownership: Shared ownership</td>
+<td>2020</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">22</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Social rented: Rents from council or Local Aut...</td>
+<td>66360</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">23</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Social rented: Other social rented</td>
+<td>56478</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">24</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Private rented: Private landlord or letting ag...</td>
+<td>87615</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Private rented: Other private rented</td>
+<td>14552</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">26</td>
+<td>Wales</td>
+<td>Female</td>
+<td>Lives rent free</td>
+<td>1247</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">27</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Does not apply</td>
+<td>0</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">28</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Owned: Owns outright</td>
+<td>292357</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">29</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Owned: Owns with a mortgage or loan</td>
+<td>248774</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">30</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Shared ownership: Shared ownership</td>
+<td>2263</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">31</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Social rented: Rents from council or Local Aut...</td>
+<td>50277</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">32</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Social rented: Other social rented</td>
+<td>48978</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">33</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Private rented: Private landlord or letting ag...</td>
+<td>107229</td>
+<td>HRP</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">34</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Private rented: Other private rented</td>
+<td>19245</td>
+<td>HRP</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">35</td>
+<td>Wales</td>
+<td>Male</td>
+<td>Lives rent free</td>
+<td>933</td>
+<td>HRP</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 
 
 </section>

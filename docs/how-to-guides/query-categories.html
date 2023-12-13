@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="How to query metadata on a particular feature item">
 
-<title>`census21api` – qa</title>
+<title>census21api - Querying feature item categories</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,25 +21,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -59,6 +94,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -70,7 +108,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title"><code>census21api</code></span>
     </a>
   </div>
@@ -81,15 +119,19 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html" rel="" target="">
+    <a class="nav-link" href="../../index.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./docs/tutorials/index.html" rel="" target="">
+    <a class="nav-link" href="../../docs/tutorials/index.html" rel="" target="">
  <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./docs/reference/index.html" rel="" target="">
+    <a class="nav-link" href="../../docs/how-to-guides/index.html" rel="" target="">
+ <span class="menu-text">How-to guides</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs/reference/index.html" rel="" target="">
  <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -126,128 +168,215 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Querying feature item categories</h1>
+</div>
+
+<div>
+  <div class="description">
+    How to query metadata on a particular feature item
+  </div>
+</div>
 
 
-<section id="quality-assurance-checklist" class="level2">
-<h2 class="anchored" data-anchor-id="quality-assurance-checklist">Quality assurance checklist</h2>
-<p>Quality assurance checklist from <a href="https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html">the quality assurance of code for analysis and research guidance</a>.</p>
-<section id="modular-code" class="level3">
-<h3 class="anchored" data-anchor-id="modular-code">Modular code</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Individual pieces of logic are written as functions. Classes are used if more appropriate.</li>
-<li><input type="checkbox" checked="">Repetition in the code is minimalised. For example, by moving reusable code into functions or classes.</li>
-</ul>
-</section>
-<section id="good-coding-practices" class="level3">
-<h3 class="anchored" data-anchor-id="good-coding-practices">Good coding practices</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Names used in the code are informative and concise.</li>
-<li><input type="checkbox" checked="">Code logic is clear and avoids unnecessary complexity.</li>
-<li><input type="checkbox" checked="">Code follows a standard style, e.g.&nbsp;<a href="https://www.python.org/dev/peps/pep-0008/">PEP8 for Python</a> and <a href="https://google.github.io/styleguide/Rguide.html">Google</a> or <a href="https://style.tidyverse.org/">tidyverse</a> for R.</li>
-</ul>
-</section>
-<section id="project-structure" class="level3">
-<h3 class="anchored" data-anchor-id="project-structure">Project structure</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">A clear, standard directory structure is used to separate input data, outputs, code and documentation.</li>
-</ul>
-</section>
-<section id="code-documentation" class="level3">
-<h3 class="anchored" data-anchor-id="code-documentation">Code documentation</h3>
-<ul class="task-list">
-<li><input type="checkbox">Comments are used to describe why code is written in a particular way, rather than describing what the code is doing.</li>
-<li><input type="checkbox">Comments are kept up to date, so they do not confuse the reader.</li>
-<li><input type="checkbox" checked="">Code is not commented out to adjust which lines of code run.</li>
-<li><input type="checkbox" checked="">All functions and classes are documented to describe what they do, what inputs they take and what they return.</li>
-<li><input type="checkbox" checked="">Python code is <a href="https://www.python.org/dev/peps/pep-0257/">documented using docstrings</a>. R code is <a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/roxygen2.html">documented using <code>roxygen2</code> comments</a>.</li>
-</ul>
-</section>
-<section id="project-documentation" class="level3">
-<h3 class="anchored" data-anchor-id="project-documentation">Project documentation</h3>
-<ul class="task-list">
-<li><input type="checkbox">A README file details the purpose of the project, basic installation instructions, and examples of usage.</li>
-<li><input type="checkbox">Where appropriate, guidance for prospective contributors is available including a code of conduct.</li>
-<li><input type="checkbox">If the code’s users are not familiar with the code, desk instructions are provided to guide lead users through example use cases.</li>
-<li><input type="checkbox">The extent of analytical quality assurance conducted on the project is clearly documented.</li>
-<li><input type="checkbox">Assumptions in the analysis and their quality are documented next to the code that implements them. These are also made available to users.</li>
-<li><input type="checkbox">Copyright and licenses are specified for both documentation and code.</li>
-<li><input type="checkbox">Instructions for how to cite the project are given.</li>
-</ul>
-</section>
-<section id="version-control" class="level3">
-<h3 class="anchored" data-anchor-id="version-control">Version control</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Code is <a href="https://git-scm.com/">version controlled using Git</a>.</li>
-<li><input type="checkbox" checked="">Code is committed regularly, preferably when a discrete unit of work has been completed.</li>
-<li><input type="checkbox" checked="">An appropriate branching strategy is defined and used throughout development.</li>
-<li><input type="checkbox" checked="">Code is open-sourced. Any sensitive data are omitted or replaced with dummy data.</li>
-</ul>
-</section>
-<section id="configuration" class="level3">
-<h3 class="anchored" data-anchor-id="configuration">Configuration</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Credentials and other secrets are not written in code but are configured as environment variables.</li>
-<li><input type="checkbox" checked="">Configuration is clearly separated from code used for analysis, so that it is simple to identify and update.</li>
-<li><input type="checkbox">The configuration used to generate particular outputs, releases and publications is recorded.</li>
-</ul>
-</section>
-<section id="data-management" class="level3">
-<h3 class="anchored" data-anchor-id="data-management">Data management</h3>
-<ul class="task-list">
-<li><input type="checkbox">Published outputs meet <a href="https://analysisfunction.civilservice.gov.uk/area_of_work/accessibility/">accessibility regulations</a>.</li>
-<li><input type="checkbox">All data for analysis are stored in an open format, so that specific software is not required to access them.</li>
-<li><input type="checkbox">Input data are stored safely and are treated as read-only.</li>
-<li><input type="checkbox">Input data are versioned. All changes to the data result in new versions being created, or <a href="https://en.wikipedia.org/wiki/Slowly_changing_dimension">changes are recorded as new records</a>.</li>
-<li><input type="checkbox">All input data is documented in a data register, including where they come from and their importance to the analysis.</li>
-<li><input type="checkbox">Outputs from your analysis are disposable and are regularly deleted and regenerated while analysis develops. Your analysis code is able to reproduce them at any time.</li>
-<li><input type="checkbox">Non-sensitive data are made available to users. If data are sensitive, dummy data is made available so that the code can be run by others.</li>
-<li><input type="checkbox">Data quality is monitored, as per <a href="https://www.gov.uk/government/publications/the-government-data-quality-framework/the-government-data-quality-framework">the government data quality framework</a>.</li>
-</ul>
-</section>
-<section id="peer-review" class="level3">
-<h3 class="anchored" data-anchor-id="peer-review">Peer review</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Peer review is conducted and recorded near to the code. Merge or pull requests are used to document review, when relevant.</li>
-</ul>
-</section>
-<section id="testing" class="level3">
-<h3 class="anchored" data-anchor-id="testing">Testing</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Core functionality is unit tested as code. See <a href="https://docs.pytest.org/en/stable/"><code>pytest</code> for Python</a> and <a href="https://testthat.r-lib.org/"><code>testthat</code> for R</a>.</li>
-<li><input type="checkbox" checked="">Code based tests are run regularly, ideally being automated using continuous integration.</li>
-<li><input type="checkbox" checked="">Bug fixes include implementing new unit tests to ensure that the same bug does not reoccur.</li>
-<li><input type="checkbox">Informal tests are recorded near to the code.</li>
-<li><input type="checkbox">Stakeholder or user acceptance sign-offs are recorded near to the code.</li>
-</ul>
-</section>
-<section id="dependency-management" class="level3">
-<h3 class="anchored" data-anchor-id="dependency-management">Dependency management</h3>
-<ul class="task-list">
-<li><input type="checkbox">Required passwords, secrets and tokens are documented, but are stored outside of version control.</li>
-<li><input type="checkbox" checked="">Required libraries and packages are documented, including their versions.</li>
-<li><input type="checkbox" checked="">Working operating system environments are documented.</li>
-<li><input type="checkbox">Example configuration files are provided.</li>
-</ul>
-</section>
-<section id="logging" class="level3">
-<h3 class="anchored" data-anchor-id="logging">Logging</h3>
-<ul class="task-list">
-<li><input type="checkbox" checked="">Misuse or failure in the code produces informative error messages.</li>
-<li><input type="checkbox">Code configuration is recorded when the code is run.</li>
-</ul>
-</section>
-<section id="project-management" class="level3">
-<h3 class="anchored" data-anchor-id="project-management">Project management</h3>
-<ul class="task-list">
-<li><input type="checkbox">The roles and responsibilities of team members are clearly defined.</li>
-<li><input type="checkbox">An issue tracker (e.g GitHub Project, Trello or Jira) is used to record development tasks.</li>
-<li><input type="checkbox" checked="">New issues or tasks are guided by users’ needs and stories.</li>
-<li><input type="checkbox">Acceptance criteria are noted for issues and tasks. Fulfilment of acceptance criteria is recorded.</li>
-<li><input type="checkbox" checked="">Quality assurance standards and processes for the project are defined. These are based around <a href="https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html">the quality assurance of code for analysis and research guidance document</a>.</li>
-</ul>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Some of the features (area types and dimensions) for a population type may be unfamiliar or difficult to understand. This guide shows you how to get metadata on an item from a feature.</p>
+<section id="querying-a-dimensions-categorisations" class="level2">
+<h2 class="anchored" data-anchor-id="querying-a-dimensions-categorisations">Querying a dimension’s categorisations</h2>
+<p>To do this for a given dimension, pass your population type and item to the <code>CensusAPI.query_categories()</code> method.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> census21api <span class="im">import</span> CensusAPI</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>api <span class="op">=</span> CensusAPI()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>population_type <span class="op">=</span> <span class="st">"UR_HH"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>feature <span class="op">=</span> <span class="st">"dimensions"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>item <span class="op">=</span> <span class="st">"health_in_general"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>api.query_categories(population_type, feature, item)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
 
 
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">label</th>
+<th data-quarto-table-cell-role="th">dimension</th>
+<th data-quarto-table-cell-role="th">population_type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>-8</td>
+<td>Does not apply</td>
+<td>health_in_general</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>Very good health</td>
+<td>health_in_general</td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>Good health</td>
+<td>health_in_general</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>Fair health</td>
+<td>health_in_general</td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>Bad health</td>
+<td>health_in_general</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>5</td>
+<td>Very bad health</td>
+<td>health_in_general</td>
+<td>UR_HH</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
+<section id="querying-an-area-types-areas" class="level2">
+<h2 class="anchored" data-anchor-id="querying-an-area-types-areas">Querying an area type’s areas</h2>
+<p>You can use the same method to query category metadata for area types:</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>feature <span class="op">=</span> <span class="st">"area-types"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>item <span class="op">=</span> <span class="st">"msoa"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>api.query_categories(population_type, feature, item)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">label</th>
+<th data-quarto-table-cell-role="th">area_type</th>
+<th data-quarto-table-cell-role="th">population_type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>E02000001</td>
+<td>City of London 001</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>E02000002</td>
+<td>Barking and Dagenham 001</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>E02000003</td>
+<td>Barking and Dagenham 002</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>E02000004</td>
+<td>Barking and Dagenham 003</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>E02000005</td>
+<td>Barking and Dagenham 004</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7259</td>
+<td>W02000424</td>
+<td>Wrexham 021</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7260</td>
+<td>W02000425</td>
+<td>Wrexham 022</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7261</td>
+<td>W02000426</td>
+<td>Wrexham 023</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7262</td>
+<td>W02000427</td>
+<td>Neath Port Talbot 021</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7263</td>
+<td>W02000428</td>
+<td>Swansea 032</td>
+<td>msoa</td>
+<td>UR_HH</td>
+</tr>
+</tbody>
+</table>
+
+<p>7264 rows × 4 columns</p>
+</div>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -487,10 +616,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">All content is available under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence V3.0</a>, except where otherwise stated.<br> Built using <a href="https://quarto.org/">Quarto</a>.</div>   
-    <div class="nav-footer-center">
-      &nbsp;
-    </div>
+    <div class="nav-footer-left">All content is available under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence V3.0</a>, except where otherwise stated.</div>   
+    <div class="nav-footer-center">Built using <a href="https://quarto.org/">Quarto</a> and <a href="https://diataxis.fr/">Diátaxis</a>.</div>
     <div class="nav-footer-right">
       &nbsp;
     </div>

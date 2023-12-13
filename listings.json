@@ -1,5 +1,20 @@
 [
   {
+    "listing": "/docs/how-to-guides/index.html",
+    "items": [
+      "/docs/how-to-guides/query-table.html",
+      "/docs/how-to-guides/query-categories.html",
+      "/docs/how-to-guides/query-feature.html",
+      "/docs/how-to-guides/query-population-types.html"
+    ]
+  },
+  {
+    "listing": "/docs/reference/index.html",
+    "items": [
+      "/docs/reference/api/index.html"
+    ]
+  },
+  {
     "listing": "/docs/tutorials/index.html",
     "items": [
       "/docs/tutorials/installation.html",
