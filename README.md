@@ -87,9 +87,9 @@ contribution or opening an issue.
 
 ### Blocked dimension combinations
 
-Some combinations of columns (dimensions) cannot be queried at once. See #39
-for an example. This is a deliberate block put in place by the developers of
-the API.
+Some combinations of columns (dimensions) cannot be queried at once. See
+[#39](https://github.com/datasciencecampus/issues/39) for an example. This is a
+deliberate block put in place by the developers of the API.
 
 ### Some columns are missing
 

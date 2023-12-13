@@ -87,28 +87,6 @@ def st_feature_queries(draw):
 
 
 @st.composite
-def st_category_queries(draw):
-    """Create a category metadata query pack for testing."""
-
-    population_type = draw(st.sampled_from(POPULATION_TYPES))
-    feature = draw(st.sampled_from(("area-types", "dimensions")))
-    endpoint = "areas" if feature == "area-types" else "categorisations"
-
-    items_by_population_type = (
-        AREA_TYPES_BY_POPULATION_TYPE
-        if feature == "area-types"
-        else DIMENSIONS_BY_POPULATION_TYPE
-    )
-    possible_items = items_by_population_type[population_type]
-    item = draw(st.sampled_from(possible_items))
-
-    num_items = draw(st.integers(1, 5))
-    items = [{"item": st.text()} for _ in range(num_items)]
-
-    return population_type, feature, item, endpoint, items
-
-
-@st.composite
 def st_population_types(draw, include_interested=False):
     """Sample a set of population types and their metadata."""
 
@@ -131,3 +109,36 @@ def st_population_types(draw, include_interested=False):
     )
 
     return population_types, json_metadata, interested
+
+
+@st.composite
+def st_category_queries(draw, feature=None):
+    """Create a category metadata query pack for testing."""
+
+    population_type = draw(st.sampled_from(POPULATION_TYPES))
+    feature = feature or draw(st.sampled_from(("area-types", "dimensions")))
+    num_categories = draw(st.integers(1, 5))
+
+    if feature == "area-types":
+        item = draw(
+            st.sampled_from(AREA_TYPES_BY_POPULATION_TYPE[population_type])
+        )
+        categories = [
+            {
+                "id": draw(st.text()),
+                "label": draw(st.text()),
+                "area_type": item,
+            }
+            for _ in range(num_categories)
+        ]
+
+    if feature == "dimensions":
+        item = draw(
+            st.sampled_from(DIMENSIONS_BY_POPULATION_TYPE[population_type])
+        )
+        categories = [
+            {"id": draw(st.text()), "label": draw(st.text())}
+            for _ in range(num_categories)
+        ]
+
+    return population_type, item, categories

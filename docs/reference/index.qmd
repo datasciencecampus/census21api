@@ -1,0 +1,27 @@
+---
+title: Reference
+listing:
+    id: reference
+    type: table
+    contents:
+        - api/index.qmd
+    fields: [title, description]
+    sort: false
+---
+
+This section of the documentation covers the reference material for
+`census21api`. According to the Diátaxis framework, reference guides are:
+
+> technical descriptions of the machinery and how to operate it. Reference
+> material is information-oriented.
+
+Right now, the only reference material we need our API reference, which
+contains the technical details of the core `CensusAPI` class and its methods.
+
+We automatically generate this reference material using
+[`quartodoc`](https://machow.github.io/quartodoc/get-started/overview.html).
+
+<br>
+
+:::{#reference}
+:::

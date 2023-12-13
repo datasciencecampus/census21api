@@ -1,0 +1,13 @@
+---
+title: How-to guides
+listing:
+    type: table
+    contents:
+        - "*.ipynb"
+    fields: [title, description]
+---
+
+This section of the documentation comprises bite-size, task-oriented guides on
+how to make different queries using `census21api`.
+
+<br>
