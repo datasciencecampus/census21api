@@ -39,7 +39,12 @@ jobs:
           python -m pip install ".[docs]"
           python -m doctest README.md
           python -m pytest docs \
-            --nbval --nbval-current-env --randomly-dont-reorganize
+            --nbval \
+            --nbval-current-env \
+            --randomly-dont-reorganize \
+            --cov=census21api \
+            --cov-config=.docscoveragerc \
+            --cov-fail-under=99
       - name: Install and run linters
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.11
         run: |
