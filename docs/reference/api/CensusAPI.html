@@ -134,64 +134,8 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="census21api.wrapper.CensusAPI" class="level1">
 <h1>CensusAPI</h1>
-<p><code>wrapper.CensusAPI(self, logger=False)</code></p>
+<p><code>wrapper.CensusAPI()</code></p>
 <p>A wrapper for the 2021 England and Wales Census API.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
-<table class="table">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 8%">
-<col style="width: 68%">
-<col style="width: 11%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>logger</code></td>
-<td>bool</td>
-<td>Whether to be verbose about issues when connecting to the API.</td>
-<td><code>False</code></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="attributes" class="level2">
-<h2 class="anchored" data-anchor-id="attributes">Attributes</h2>
-<table class="table">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 9%">
-<col style="width: 79%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>_current_data</td>
-<td>dict or None</td>
-<td>Data dictionary from the most recent API call. If no call has been made or the last call failed, this is <code>None</code>.</td>
-</tr>
-<tr class="even">
-<td>_current_url</td>
-<td>str or None</td>
-<td>URL of the most recent API call. If no call has been made, this is <code>None</code>.</td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="methods" class="level2">
 <h2 class="anchored" data-anchor-id="methods">Methods</h2>
 <table class="table">
@@ -228,8 +172,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="census21api.wrapper.CensusAPI.get">get</h3>
 <p><code>wrapper.CensusAPI.get(url)</code></p>
 <p>Make a call to, and retrieve some data from, the API.</p>
-<section id="parameters-1" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
+<section id="parameters" class="level4">
+<h4 class="anchored" data-anchor-id="parameters">Parameters</h4>
 <table class="table">
 <thead>
 <tr class="header">
@@ -280,8 +224,8 @@ ul.task-list li input[type="checkbox"] {
 <li><code>/{population_type}/area-types/{item}/areas</code></li>
 <li><code>/{population_type}/dimensions/{item}/categorisations</code></li>
 </ul>
-<section id="parameters-2" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
+<section id="parameters-1" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-1">Parameters</h4>
 <table class="table">
 <colgroup>
 <col style="width: 18%">
@@ -346,8 +290,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>wrapper.CensusAPI.query_feature(population_type, feature, *items)</code></p>
 <p>Query metadata on a feature for a population type.</p>
 <p>This method connects to the <code>area-types</code> and <code>dimensions</code> endpoints (ie. <code>/{population_type}/{endpoint}</code>) and returns a data frame format of the metadata there.</p>
-<section id="parameters-3" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
+<section id="parameters-2" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-2">Parameters</h4>
 <table class="table">
 <colgroup>
 <col style="width: 6%">
@@ -412,8 +356,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>wrapper.CensusAPI.query_population_types(*population_types)</code></p>
 <p>Query the metadata for a set of population types.</p>
 <p>This method finds all available population types and retrieves their metadata from the <code>population-types</code> endpoint, returning the combined information as a data frame.</p>
-<section id="parameters-4" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
+<section id="parameters-3" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-3">Parameters</h4>
 <table class="table">
 <colgroup>
 <col style="width: 10%">
@@ -466,8 +410,8 @@ ul.task-list li input[type="checkbox"] {
 <p><code>wrapper.CensusAPI.query_table(population_type, area_type, dimensions, use_id=True)</code></p>
 <p>Query a custom table from the API.</p>
 <p>This method connects to the <code>census-observations</code> endpoint <code>/{population_type}/census-observations</code> with query parameters <code>?area-type={area_type}&amp;dimensions={','.join(dimensions)}</code>.</p>
-<section id="parameters-5" class="level4">
-<h4 class="anchored" data-anchor-id="parameters-5">Parameters</h4>
+<section id="parameters-4" class="level4">
+<h4 class="anchored" data-anchor-id="parameters-4">Parameters</h4>
 <table class="table">
 <colgroup>
 <col style="width: 13%">
