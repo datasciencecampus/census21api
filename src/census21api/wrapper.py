@@ -15,28 +15,7 @@ DataLike = Optional[pd.DataFrame]
 
 
 class CensusAPI:
-    """
-    A wrapper for the 2021 England and Wales Census API.
-
-    Parameters
-    ----------
-    logger : bool, default False
-        Whether to be verbose about issues when connecting to the API.
-
-    Attributes
-    ----------
-    _current_data : dict or None
-        Data dictionary from the most recent API call. If no call has
-        been made or the last call failed, this is `None`.
-    _current_url : str or None
-        URL of the most recent API call. If no call has been made, this
-        is `None`.
-    """
-
-    def __init__(self, logger: bool = False) -> None:
-        self._logger: bool = logger
-        self._current_url: str = None
-        self._current_data: JSONLike = None
+    """A wrapper for the 2021 England and Wales Census API."""
 
     def _process_response(self, response: Response) -> JSONLike:
         """
@@ -57,32 +36,27 @@ class CensusAPI:
         """
 
         if not 200 <= response.status_code <= 299:
-            if self._logger:
-                warnings.warn(
-                    "\n".join(
-                        (
-                            f"Unsuccessful GET from {self._current_url}",
-                            f"Status code: {response.status_code}",
-                            response.body,
-                        )
-                    ),
-                    UserWarning,
-                )
+            warnings.warn(
+                "\n".join(
+                    (
+                        f"Unsuccessful GET from {response.url}",
+                        f"Status code: {response.status_code}",
+                        response.text,
+                    )
+                ),
+                UserWarning,
+            )
             return None
 
         try:
             return response.json()
         except JSONDecodeError as e:
-            if self._logger:
-                warnings.warn(
-                    "\n".join(
-                        (
-                            f"Error decoding data from {self._current_url}:",
-                            str(e),
-                        )
-                    ),
-                    UserWarning,
-                )
+            warnings.warn(
+                "\n".join(
+                    (f"Error decoding data from {response.url}:", str(e))
+                ),
+                UserWarning,
+            )
 
     def get(self, url: str) -> JSONLike:
         """
@@ -100,13 +74,9 @@ class CensusAPI:
             successful, and `None` otherwise.
         """
 
-        self._current_url = url
         response = requests.get(url, verify=True)
 
-        data = self._process_response(response)
-        self._current_data = data
-
-        return self._current_data
+        return self._process_response(response)
 
     def _query_table_json(
         self, population_type: str, area_type: str, dimensions: List[str]

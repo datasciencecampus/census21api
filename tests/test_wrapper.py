@@ -27,15 +27,13 @@ from .strategies import (
 MOCK_URL = "mock://test.com/"
 
 
-@given(st.booleans())
-def test_init(logger):
+def test_init():
     """Test that the `CensusAPI` class can be instantiated correctly."""
 
-    api = CensusAPI(logger)
+    api = CensusAPI()
 
-    assert api._logger is logger
-    assert api._current_data is None
-    assert api._current_url is None
+    assert isinstance(api, CensusAPI)
+    assert vars(api) == {}
 
 
 @given(st.dictionaries(st.text(), st.text()))
@@ -59,13 +57,14 @@ def test_process_response_valid(json):
 def test_process_response_invalid_status_code(status):
     """Test an invalid status code returns no data and a warning."""
 
-    api = CensusAPI(logger=True)
+    api = CensusAPI()
 
     response = mock.MagicMock()
     response.status_code = status
-    response.body = "foo"
+    response.url = MOCK_URL
+    response.text = "foo"
 
-    with pytest.warns(UserWarning, match="Unsuccessful GET from"):
+    with pytest.warns(UserWarning, match=f"Unsuccessful GET from {MOCK_URL}"):
         data = api._process_response(response)
 
     assert data is None
@@ -77,13 +76,16 @@ def test_process_response_invalid_json():
     We expect the processor to return no data and a warning.
     """
 
-    api = CensusAPI(logger=True)
+    api = CensusAPI()
 
     response = mock.MagicMock()
     response.status_code = 200
+    response.url = MOCK_URL
     response.json.side_effect = json.JSONDecodeError("foo", "bar", 42)
 
-    with pytest.warns(UserWarning, match="Error decoding data from"):
+    with pytest.warns(
+        UserWarning, match=f"Error decoding data from {MOCK_URL}"
+    ):
         data = api._process_response(response)
 
     assert data is None
@@ -103,8 +105,6 @@ def test_get(json):
         process.return_value = json
         data = api.get(MOCK_URL)
 
-    assert api._current_url == MOCK_URL
-    assert api._current_data == data
     assert data == json
 
     get.assert_called_once_with(MOCK_URL, verify=True)
