@@ -175,8 +175,17 @@ def test_query_table_valid(records_and_query, use_id):
     assert data.columns.to_list() == expected_columns
     assert (data["population_type"] == population_type).all()
 
+    assert data[[area_type, "count", "population_type"]].dtypes.to_list() == [
+        "object", "int", "object"
+    ]
+
+    if use_id:
+        assert (data[list(dimensions)].dtypes == int).all()
+    else:
+        assert (data[list(dimensions)].dtypes == "object").all()
+
     for i, row in data.drop("population_type", axis=1).iterrows():
-        assert tuple(row) == records[i]
+        assert (*map(str, row[:-1]), row[-1]) == records[i]
 
     querist.assert_called_once_with(population_type, area_type, dimensions)
     extract.assert_called_once_with("foo", use_id)
