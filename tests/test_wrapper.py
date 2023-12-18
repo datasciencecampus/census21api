@@ -176,7 +176,9 @@ def test_query_table_valid(records_and_query, use_id):
     assert (data["population_type"] == population_type).all()
 
     assert data[[area_type, "count", "population_type"]].dtypes.to_list() == [
-        "object", "int", "object"
+        "object",
+        "int",
+        "object",
     ]
 
     if use_id:
