@@ -144,7 +144,7 @@ class CensusAPI:
         -------
         data : pandas.DataFrame or None
             Data frame containing the data from the API call if it is
-            successful, and `None` otherwise.
+            successful and without blocked pairs, and `None` otherwise.
         """
 
         table_json = self._query_table_json(
@@ -152,6 +152,13 @@ class CensusAPI:
         )
 
         if isinstance(table_json, dict) and "observations" in table_json:
+            if table_json.get("blocked_areas"):
+                warnings.warn(
+                    "Dimensions include a blocked pair - no table available.",
+                    UserWarning,
+                )
+                return None
+
             records = _extract_records_from_observations(
                 table_json["observations"], use_id
             )
