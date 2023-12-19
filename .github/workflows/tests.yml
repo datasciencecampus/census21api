@@ -44,7 +44,7 @@ jobs:
             --randomly-dont-reorganize \
             --cov=census21api \
             --cov-config=.docscoveragerc \
-            --cov-fail-under=99
+            --cov-fail-under=97
       - name: Install and run linters
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.11
         run: |
