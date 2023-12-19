@@ -58,8 +58,8 @@ def st_records_and_queries(draw, max_nrows=10):
     for _ in range(nrows):
         record = (
             draw(st.text()),
-            *(draw(st.text()) for _ in dimensions),
-            draw(st.integers()),
+            *(str(draw(st.integers(-1, 10))) for _ in dimensions),
+            draw(st.integers(0, 1000)),
         )
         records.append(record)
 

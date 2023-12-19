@@ -172,11 +172,24 @@ def test_query_table_valid(records_and_query, use_id):
     assert len(data) == len(records)
 
     expected_columns = [area_type, *dimensions, "count", "population_type"]
-    assert data.columns.to_list() == expected_columns
+    assert all(data.columns == expected_columns)
     assert (data["population_type"] == population_type).all()
 
+    if use_id:
+        assert all(data.select_dtypes("int").columns == [*dimensions, "count"])
+        assert all(
+            data.select_dtypes("object").columns
+            == [area_type, "population_type"]
+        )
+    else:
+        assert all(data.select_dtypes("int").columns == ["count"])
+        assert all(
+            data.select_dtypes("object").columns
+            == [area_type, *dimensions, "population_type"]
+        )
+
     for i, row in data.drop("population_type", axis=1).iterrows():
-        assert tuple(row) == records[i]
+        assert (*map(str, row[:-1]), row[-1]) == records[i]
 
     querist.assert_called_once_with(population_type, area_type, dimensions)
     extract.assert_called_once_with("foo", use_id)

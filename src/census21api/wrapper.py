@@ -156,10 +156,13 @@ class CensusAPI:
                 table_json["observations"], use_id
             )
             columns = (area_type, *dimensions, "count")
-            data = pd.DataFrame(records, columns=columns)
-            data["population_type"] = population_type
+            table = pd.DataFrame(records, columns=columns)
+            table["population_type"] = population_type
 
-            return data
+            if use_id:
+                table = table.astype({dim: int for dim in dimensions})
+
+            return table
 
     def _get_population_types(self) -> Set[str]:
         """
