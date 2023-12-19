@@ -59,19 +59,19 @@ Here's a basic example of how to use the `CensusAPI` class to retrieve a table:
 >>> # Submit the parameters to the table querist method
 >>> table = api.query_table(population_type, area_type, dimensions)
 >>> print(table)
-         ctry sex hh_deprivation_housing     count population_type
-0   E92000001   1                     -8         0           UR_HH
-1   E92000001   1                      0  24993178           UR_HH
-2   E92000001   1                      1   3340293           UR_HH
-3   E92000001   2                     -8         0           UR_HH
-4   E92000001   2                      0  23890474           UR_HH
-5   E92000001   2                      1   3280355           UR_HH
-6   W92000004   1                     -8         0           UR_HH
-7   W92000004   1                      0   1457330           UR_HH
-8   W92000004   1                      1    100914           UR_HH
-9   W92000004   2                     -8         0           UR_HH
-10  W92000004   2                      0   1391731           UR_HH
-11  W92000004   2                      1    101574           UR_HH
+         ctry  sex  hh_deprivation_housing     count population_type
+0   E92000001    1                      -8         0           UR_HH
+1   E92000001    1                       0  24993178           UR_HH
+2   E92000001    1                       1   3340293           UR_HH
+3   E92000001    2                      -8         0           UR_HH
+4   E92000001    2                       0  23890474           UR_HH
+5   E92000001    2                       1   3280355           UR_HH
+6   W92000004    1                      -8         0           UR_HH
+7   W92000004    1                       0   1457330           UR_HH
+8   W92000004    1                       1    100914           UR_HH
+9   W92000004    2                      -8         0           UR_HH
+10  W92000004    2                       0   1391731           UR_HH
+11  W92000004    2                       1    101574           UR_HH
 
 ```
 
