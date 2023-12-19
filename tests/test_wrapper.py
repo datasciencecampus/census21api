@@ -215,6 +215,25 @@ def test_query_table_invalid(query, result):
     builder.assert_called_once_with(*query)
 
 
+@given(st_table_queries())
+def test_query_table_invalid_blocked(query):
+    """Test the querist returns nothing if the columns are blocked."""
+
+    population_type, area_type, dimensions = query
+
+    api = CensusAPI()
+
+    with mock.patch(
+        "census21api.wrapper.CensusAPI._query_table_json"
+    ) as query, pytest.warns(UserWarning, match="blocked pair"):
+        query.return_value = {"observations": None, "blocked_areas": 1}
+        data = api.query_table(population_type, area_type, dimensions)
+
+    assert data is None
+
+    query.assert_called_once_with(population_type, area_type, dimensions)
+
+
 @given(
     st.lists(
         st.tuples(st.text(), st.sampled_from(("microdata", "tabular"))),
