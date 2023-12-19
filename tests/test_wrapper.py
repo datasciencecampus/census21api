@@ -3,6 +3,7 @@
 import json
 from unittest import mock
 
+import numpy as np
 import pandas as pd
 import pytest
 from hypothesis import given
@@ -176,15 +177,15 @@ def test_query_table_valid(records_and_query, use_id):
     assert (data["population_type"] == population_type).all()
 
     assert data[[area_type, "count", "population_type"]].dtypes.to_list() == [
-        "object",
-        "int",
-        "object",
+        np.dtypes.ObjectDType(),
+        np.dtypes.Int64DType(),
+        np.dtypes.ObjectDType(),
     ]
 
     if use_id:
-        assert (data[list(dimensions)].dtypes == int).all()
+        assert (data[list(dimensions)].dtypes == np.dtypes.Int64DType()).all()
     else:
-        assert (data[list(dimensions)].dtypes == "object").all()
+        assert (data[list(dimensions)].dtypes == np.dtypes.ObjectDType()).all()
 
     for i, row in data.drop("population_type", axis=1).iterrows():
         assert (*map(str, row[:-1]), row[-1]) == records[i]
