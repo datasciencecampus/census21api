@@ -75,6 +75,17 @@ Here's a basic example of how to use the `CensusAPI` class to retrieve a table:
 
 ```
 
+> [!TIP]
+> If you encounter SSL verification issues, you can bypass this step by
+> setting the `verify` parameter when creating an instance of `CensusAPI`:
+> ```python
+> api_unverified = CensusAPI(verify=False)
+> ```
+> In general, this is <ins>not recommended</ins> as SSL verification helps
+> ensure the security of your machine and its connection to the internet.
+> Please use this at your own discretion.
+
+
 ## Limitations
 
 The `CensusAPI` class includes a variety of methods to interact with the API in
@@ -98,6 +109,7 @@ through, some dimensions are not available in the API. For instance, you cannot
 query tables containing age data despite being able to create them through the
 web interface. Again, this is a deliberate choice by the developers and may be
 subject to change.
+
 
 ## Contributing
 

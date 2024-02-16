@@ -15,7 +15,16 @@ DataLike = Optional[pd.DataFrame]
 
 
 class CensusAPI:
-    """A wrapper for the 2021 England and Wales Census API."""
+    """A wrapper for the 2021 England and Wales Census API.
+
+    Parameters
+    ----------
+    verify : bool
+        Whether to use SSL verification. Defaults to True.
+    """
+
+    def __init__(self, verify: bool = True) -> None:
+        self.verify: bool = verify
 
     def _process_response(self, response: Response) -> JSONLike:
         """
@@ -74,7 +83,7 @@ class CensusAPI:
             successful, and `None` otherwise.
         """
 
-        response = requests.get(url, verify=True)
+        response = requests.get(url, verify=self.verify)
 
         return self._process_response(response)
 
