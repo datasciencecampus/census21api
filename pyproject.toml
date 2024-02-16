@@ -51,8 +51,8 @@ homepage = "https://github.com/datasciencecampus/census21api"
 line-length = 79
 
 [tool.ruff]
-extend-select = ["I", "W"]
+lint.extend-select = ["I", "W"]
 line-length = 79
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["census21api"]
