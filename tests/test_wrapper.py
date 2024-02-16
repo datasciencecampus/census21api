@@ -26,14 +26,15 @@ from .strategies import (
 
 MOCK_URL = "mock://test.com/"
 
-
-def test_init():
+@given(st.booleans())
+def test_init(verify: bool):
     """Test that the `CensusAPI` class can be instantiated correctly."""
 
-    api = CensusAPI()
+    api = CensusAPI(verify)
 
     assert isinstance(api, CensusAPI)
-    assert vars(api) == {}
+    assert vars(api) == {"verify": verify}
+    
 
 
 @given(st.dictionaries(st.text(), st.text()))
@@ -91,11 +92,11 @@ def test_process_response_invalid_json():
     assert data is None
 
 
-@given(st.dictionaries(st.text(), st.text()))
-def test_get(json):
+@given(st.dictionaries(st.text(), st.text()), st.booleans())
+def test_get(json, verify: bool):
     """Test that the API only gives data from successful responses."""
 
-    api = CensusAPI()
+    api = CensusAPI(verify)
 
     with mock.patch("census21api.wrapper.requests.get") as get, mock.patch(
         "census21api.wrapper.CensusAPI._process_response"
@@ -107,7 +108,7 @@ def test_get(json):
 
     assert data == json
 
-    get.assert_called_once_with(MOCK_URL, verify=True)
+    get.assert_called_once_with(MOCK_URL, verify=verify)
     process.assert_called_once_with(response)
 
 
