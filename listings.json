@@ -1,5 +1,12 @@
 [
   {
+    "listing": "/docs/tutorials/index.html",
+    "items": [
+      "/docs/tutorials/installation.html",
+      "/docs/tutorials/getting-started.html"
+    ]
+  },
+  {
     "listing": "/docs/reference/index.html",
     "items": [
       "/docs/reference/api/index.html"
@@ -12,13 +19,6 @@
       "/docs/how-to-guides/query-categories.html",
       "/docs/how-to-guides/query-feature.html",
       "/docs/how-to-guides/query-population-types.html"
-    ]
-  },
-  {
-    "listing": "/docs/tutorials/index.html",
-    "items": [
-      "/docs/tutorials/installation.html",
-      "/docs/tutorials/getting-started.html"
     ]
   }
 ]

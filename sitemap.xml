@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/tutorials/installation.html</loc>
-    <lastmod>2023-12-19T09:44:22.119Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/CHANGES.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/tutorials/getting-started.html</loc>
-    <lastmod>2023-12-19T09:44:21.583Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/how-to-guides/query-feature.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-table.html</loc>
-    <lastmod>2023-12-19T09:44:20.171Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/how-to-guides/query-categories.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-population-types.html</loc>
-    <lastmod>2023-12-19T09:44:19.135Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/how-to-guides/query-population-types.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/reference/index.html</loc>
-    <lastmod>2023-12-19T09:44:18.399Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/reference/api/index.html</loc>
+    <lastmod>2024-02-16T13:08:01.775Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/reference/api/index.html</loc>
-    <lastmod>2023-12-19T09:44:17.659Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/tutorials/installation.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/index.html</loc>
-    <lastmod>2023-12-19T09:44:16.867Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/tutorials/getting-started.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/CHANGES.html</loc>
-    <lastmod>2023-12-19T09:44:17.387Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/tutorials/index.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/reference/api/CensusAPI.html</loc>
-    <lastmod>2023-12-19T09:44:18.103Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/reference/index.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-categories.html</loc>
-    <lastmod>2023-12-19T09:44:18.783Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/reference/api/CensusAPI.html</loc>
+    <lastmod>2024-02-16T13:08:01.803Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/index.html</loc>
-    <lastmod>2023-12-19T09:44:19.427Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/how-to-guides/index.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/how-to-guides/query-feature.html</loc>
-    <lastmod>2023-12-19T09:44:21.135Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/docs/how-to-guides/query-table.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
   <url>
-    <loc>https://github.com/datasciencecampus/census21api/docs/tutorials/index.html</loc>
-    <lastmod>2023-12-19T09:44:21.863Z</lastmod>
+    <loc>https://datasciencecampus.github.io/census21api/index.html</loc>
+    <lastmod>2024-02-16T13:07:20.727Z</lastmod>
   </url>
 </urlset>
