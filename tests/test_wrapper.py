@@ -26,6 +26,7 @@ from .strategies import (
 
 MOCK_URL = "mock://test.com/"
 
+
 @given(st.booleans())
 def test_init(verify: bool):
     """Test that the `CensusAPI` class can be instantiated correctly."""
@@ -34,7 +35,6 @@ def test_init(verify: bool):
 
     assert isinstance(api, CensusAPI)
     assert vars(api) == {"verify": verify}
-    
 
 
 @given(st.dictionaries(st.text(), st.text()))
