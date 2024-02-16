@@ -8,7 +8,7 @@ from census21api import CensusAPI
 def test_issue_39_blocked_pairs_gets_400_error():
     """
     Originally, this was about catching blocked pairs.
-    
+
     See https://github.com/datasciencecampus/census21api/issues/39 for
     details on the original issue.
 
