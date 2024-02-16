@@ -190,7 +190,7 @@ class CensusAPI:
             Set of codes for the available population types.
         """
 
-        json: JSONLike = self.get(f"{API_ROOT}?limit=100")
+        json = self.get(f"{API_ROOT}?limit=100")
         available_types = set(
             item["name"]
             for item in json["items"]
